@@ -12,6 +12,7 @@ const footballMatchesData = {
       awayTeam: "Chelsea",
       score: { home: 2, away: 1 },
       odds: { home: 2.1, draw: 3.4, away: 3.2 },
+      minute: 64,
     },
     {
       id: 2,
@@ -19,6 +20,7 @@ const footballMatchesData = {
       awayTeam: "Real Madrid",
       score: { home: 0, away: 0 },
       odds: { home: 2.5, draw: 3.3, away: 2.7 },
+      minute: 45,
     },
     {
       id: 3,
@@ -26,26 +28,77 @@ const footballMatchesData = {
       awayTeam: "Dortmund",
       score: { home: 4, away: 0 },
       odds: { home: 1.4, draw: 4.5, away: 7.0 },
+      minute: 78,
     },
-  ],
-  upcomingMatches: [
     {
       id: 4,
       homeTeam: "Liverpool",
       awayTeam: "Man City",
+      score: { home: 1, away: 1 },
       odds: { home: 3.1, draw: 3.5, away: 2.2 },
+      minute: 32,
     },
     {
       id: 5,
       homeTeam: "Inter Milan",
       awayTeam: "Juventus",
+      score: { home: 1, away: 0 },
       odds: { home: 2.3, draw: 3.1, away: 3.2 },
+      minute: 56,
     },
     {
       id: 6,
       homeTeam: "PSG",
       awayTeam: "Marseille",
+      score: { home: 2, away: 2 },
       odds: { home: 1.5, draw: 4.0, away: 6.0 },
+      minute: 67,
+    },
+    {
+      id: 7,
+      homeTeam: "Tottenham",
+      awayTeam: "Newcastle",
+      score: { home: 0, away: 2 },
+      odds: { home: 2.1, draw: 3.4, away: 3.3 },
+      minute: 39,
+    },
+    {
+      id: 8,
+      homeTeam: "AC Milan",
+      awayTeam: "Napoli",
+      score: { home: 3, away: 1 },
+      odds: { home: 2.8, draw: 3.2, away: 2.5 },
+      minute: 72,
+    },
+    {
+      id: 9,
+      homeTeam: "Atletico Madrid",
+      awayTeam: "Sevilla",
+      score: { home: 1, away: 1 },
+      odds: { home: 1.8, draw: 3.6, away: 4.5 },
+      minute: 51,
+    },
+    {
+      id: 10,
+      homeTeam: "Leipzig",
+      awayTeam: "Leverkusen",
+      score: { home: 0, away: 0 },
+      odds: { home: 2.7, draw: 3.5, away: 2.6 },
+      minute: 18,
+    },
+  ],
+  upcomingMatches: [
+    {
+      id: 11,
+      homeTeam: "Man United",
+      awayTeam: "Aston Villa",
+      odds: { home: 1.9, draw: 3.6, away: 4.0 },
+    },
+    {
+      id: 12,
+      homeTeam: "Roma",
+      awayTeam: "Lazio",
+      odds: { home: 2.4, draw: 3.2, away: 3.0 },
     },
   ],
 };
@@ -56,30 +109,48 @@ const updateLiveMatches = (matches: typeof footballMatchesData.liveMatches) => {
 
     const updated = { ...match };
 
+    updated.minute = Math.min(
+      90,
+      updated.minute + Math.floor(Math.random() * 3) + 1
+    );
+
     if (Math.random() < 0.1) {
-      const outcome = Math.random();
-
-      if (outcome < 0.4) {
+      if (Math.random() < 0.5) {
         updated.score.home += 1;
-      } else if (outcome < 0.8) {
+        updated.odds.home = Math.max(
+          1.1,
+          +(updated.odds.home * 0.9).toFixed(2)
+        );
+        updated.odds.away = Math.max(
+          1.1,
+          +(updated.odds.away * 1.1).toFixed(2)
+        );
+      } else {
         updated.score.away += 1;
+        updated.odds.away = Math.max(
+          1.1,
+          +(updated.odds.away * 0.9).toFixed(2)
+        );
+        updated.odds.home = Math.max(
+          1.1,
+          +(updated.odds.home * 1.1).toFixed(2)
+        );
       }
-
-      updated.odds = {
-        home: Math.max(
-          1.1,
-          +(updated.odds.home * (0.95 + Math.random() * 0.1)).toFixed(2)
-        ),
-        draw: Math.max(
-          1.1,
-          +(updated.odds.draw * (0.95 + Math.random() * 0.1)).toFixed(2)
-        ),
-        away: Math.max(
-          1.1,
-          +(updated.odds.away * (0.95 + Math.random() * 0.1)).toFixed(2)
-        ),
-      };
+      updated.odds.draw = Math.max(1.1, +(updated.odds.draw * 1.05).toFixed(2));
     }
+
+    updated.odds.home = Math.max(
+      1.1,
+      +(updated.odds.home * (0.98 + Math.random() * 0.04)).toFixed(2)
+    );
+    updated.odds.draw = Math.max(
+      1.1,
+      +(updated.odds.draw * (0.98 + Math.random() * 0.04)).toFixed(2)
+    );
+    updated.odds.away = Math.max(
+      1.1,
+      +(updated.odds.away * (0.98 + Math.random() * 0.04)).toFixed(2)
+    );
 
     return updated;
   });
@@ -151,8 +222,10 @@ export default function MatchesTable() {
               >
                 <div className="flex items-center gap-8">
                   <div className="flex flex-col items-center justify-center text-[#32ff40]">
-                    <span className="text-base">26&apos;</span>
-                    <span className="text-sm">FT</span>
+                    <span className="text-base">{match.minute}&apos;</span>
+                    <span className="text-sm">
+                      {match.minute < 46 ? "1st" : "2nd"}
+                    </span>
                   </div>
                   <div className="text-xl flex flex-col gap-2 justify-center">
                     <span>{match.homeTeam}</span>
