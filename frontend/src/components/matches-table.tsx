@@ -92,13 +92,71 @@ const footballMatchesData = {
       id: 11,
       homeTeam: "Man United",
       awayTeam: "Aston Villa",
+      startTime: "2023-11-12T15:00:00",
       odds: { home: 1.9, draw: 3.6, away: 4.0 },
     },
     {
       id: 12,
       homeTeam: "Roma",
       awayTeam: "Lazio",
+      startTime: "2023-11-12T18:00:00",
       odds: { home: 2.4, draw: 3.2, away: 3.0 },
+    },
+    {
+      id: 13,
+      homeTeam: "Porto",
+      awayTeam: "Benfica",
+      startTime: "2023-11-11T20:30:00",
+      odds: { home: 2.7, draw: 3.1, away: 2.8 },
+    },
+    {
+      id: 14,
+      homeTeam: "Ajax",
+      awayTeam: "Feyenoord",
+      startTime: "2023-11-12T13:30:00",
+      odds: { home: 2.2, draw: 3.5, away: 3.2 },
+    },
+    {
+      id: 15,
+      homeTeam: "Celtic",
+      awayTeam: "Rangers",
+      startTime: "2023-11-11T12:00:00",
+      odds: { home: 2.1, draw: 3.3, away: 3.6 },
+    },
+    {
+      id: 16,
+      homeTeam: "Boca Juniors",
+      awayTeam: "River Plate",
+      startTime: "2023-11-13T22:00:00",
+      odds: { home: 2.5, draw: 3.0, away: 3.0 },
+    },
+    {
+      id: 17,
+      homeTeam: "Galatasaray",
+      awayTeam: "Fenerbahçe",
+      startTime: "2023-11-12T19:00:00",
+      odds: { home: 2.3, draw: 3.4, away: 3.1 },
+    },
+    {
+      id: 18,
+      homeTeam: "LA Galaxy",
+      awayTeam: "LAFC",
+      startTime: "2023-11-13T03:30:00",
+      odds: { home: 3.2, draw: 3.5, away: 2.2 },
+    },
+    {
+      id: 19,
+      homeTeam: "Flamengo",
+      awayTeam: "Palmeiras",
+      startTime: "2023-11-14T23:00:00",
+      odds: { home: 2.1, draw: 3.2, away: 3.7 },
+    },
+    {
+      id: 20,
+      homeTeam: "Al Hilal",
+      awayTeam: "Al Nassr",
+      startTime: "2023-11-11T17:00:00",
+      odds: { home: 2.6, draw: 3.3, away: 2.7 },
     },
   ],
 };
@@ -114,7 +172,7 @@ const updateLiveMatches = (matches: typeof footballMatchesData.liveMatches) => {
       updated.minute + Math.floor(Math.random() * 3) + 1
     );
 
-    if (Math.random() < 0.1) {
+    if (Math.random() < 0.005) {
       if (Math.random() < 0.5) {
         updated.score.home += 1;
         updated.odds.home = Math.max(
@@ -171,12 +229,12 @@ export default function MatchesTable() {
         liveMatches: updateLiveMatches(prev.liveMatches),
         upcomingMatches: prev.upcomingMatches,
       }));
-    }, 5000);
+    }, 60000);
     return () => clearInterval(interval);
   }, []);
 
   return (
-    <div className="flex flex-col gap-4 mb-4">
+    <div className="w-full flex-[75%] flex flex-col gap-4">
       <h2 className="text-4xl">Football</h2>
       <div className="flex w-full">
         <div
@@ -267,7 +325,60 @@ export default function MatchesTable() {
               </div>
             ))
           : matches.upcomingMatches.map((match) => (
-              <div key={match.id} className="match-card"></div>
+              <div
+                key={match.id}
+                className="w-full px-8 py-6 border-b border-b-[var(--primary)]/30 flex items-center justify-between"
+              >
+                <div className="flex items-center gap-8">
+                  <div className="flex flex-col items-center justify-center">
+                    <p>
+                      {`${new Date(match.startTime)
+                        .getHours()
+                        .toString()
+                        .padStart(2, "0")}:${new Date(match.startTime)
+                        .getMinutes()
+                        .toString()
+                        .padStart(2, "0")}`}
+                    </p>
+                  </div>
+                  <div className="text-xl flex flex-col gap-2 justify-center">
+                    <span>{match.homeTeam}</span>
+                    <span>{match.awayTeam}</span>
+                  </div>
+                </div>
+                <div className="flex items-center gap-8">
+                  <div className="text-xl flex flex-col gap-2 items-center justify-center">
+                    <span>-</span>
+                    <span>-</span>
+                  </div>
+                  <span>
+                    <FootballPitchIcon />
+                  </span>
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center flex-col gap-1 justify-center">
+                      <p className="text-sm">1</p>
+                      <p className="bg-[var(--primary-light)] p-2.5 rounded-sm">
+                        {match.odds.home.toFixed(2)}
+                      </p>
+                    </div>
+                    <div className="flex items-center flex-col gap-1 justify-center">
+                      <p className="text-sm">X</p>
+                      <p className="bg-[var(--primary-light)] p-2.5 rounded-sm">
+                        {match.odds.draw.toFixed(2)}
+                      </p>
+                    </div>
+                    <div className="flex items-center flex-col gap-1 justify-center">
+                      <p className="text-sm">2</p>
+                      <p className="bg-[var(--primary-light)] p-2.5 rounded-sm">
+                        {match.odds.away.toFixed(2)}
+                      </p>
+                    </div>
+                  </div>
+                  <span>
+                    <Analysis />
+                  </span>
+                </div>
+              </div>
             ))}
       </div>
     </div>

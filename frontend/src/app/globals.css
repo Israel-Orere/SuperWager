@@ -6,6 +6,10 @@
   --primary-light: #f2f9ff;
 }
 
+* {
+  /* outline: 1px solid red; */
+}
+
 .inknut-antiqua {
   font-family: "Inknut Antiqua", sans-serif;
 }
