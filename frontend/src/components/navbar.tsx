@@ -10,7 +10,7 @@ export default function Navbar() {
     <header className="w-full max-w-screen-2xl mx-auto px-[5%] flex items-center justify-center">
       <div className="py-4 w-full flex items-center justify-between gap-4 max-w-screen-3xl overflow-x-hidden z-50">
         <div className="flex-shrink-0">
-          <h1 className="text-xl font-bold text-[var(--primary)]">
+          <h1 className="text-xl font-bold text-[var(--primary)] inknut-antiqua">
             Superwager
           </h1>
         </div>
