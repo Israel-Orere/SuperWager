@@ -31,6 +31,7 @@
     --radius-sm: .25rem;
     --radius-lg: .5rem;
     --radius-2xl: 1rem;
+    --radius-4xl: 2rem;
     --ease-in-out: cubic-bezier(.4, 0, .2, 1);
     --default-transition-duration: .15s;
     --default-transition-timing-function: cubic-bezier(.4, 0, .2, 1);
@@ -294,16 +295,28 @@
     height: calc(var(--spacing) * .5);
   }
 
-  .h-auto {
-    height: auto;
+  .h-full {
+    height: 100%;
   }
 
   .min-h-screen {
     min-height: 100vh;
   }
 
+  .w-64 {
+    width: calc(var(--spacing) * 64);
+  }
+
   .w-full {
     width: 100%;
+  }
+
+  .max-w-32 {
+    max-width: calc(var(--spacing) * 32);
+  }
+
+  .max-w-64 {
+    max-width: calc(var(--spacing) * 64);
   }
 
   .max-w-screen-2xl {
@@ -407,6 +420,10 @@
     align-self: flex-end;
   }
 
+  .self-start {
+    align-self: flex-start;
+  }
+
   .overflow-x-hidden {
     overflow-x: hidden;
   }
@@ -415,12 +432,20 @@
     border-radius: var(--radius-2xl);
   }
 
+  .rounded-4xl {
+    border-radius: var(--radius-4xl);
+  }
+
   .rounded-\[2\.25rem\] {
     border-radius: 2.25rem;
   }
 
   .rounded-\[4px\] {
     border-radius: 4px;
+  }
+
+  .rounded-\[6px\] {
+    border-radius: 6px;
   }
 
   .rounded-full {
@@ -509,6 +534,16 @@
     background-color: var(--color-white);
   }
 
+  .bg-white\/50 {
+    background-color: #ffffff80;
+  }
+
+  @supports (color: color-mix(in lab, red, red)) {
+    .bg-white\/50 {
+      background-color: color-mix(in oklab, var(--color-white) 50%, transparent);
+    }
+  }
+
   .p-2 {
     padding: calc(var(--spacing) * 2);
   }
@@ -537,6 +572,14 @@
     padding: 5%;
   }
 
+  .px-2\.5 {
+    padding-inline: calc(var(--spacing) * 2.5);
+  }
+
+  .px-3\.5 {
+    padding-inline: calc(var(--spacing) * 3.5);
+  }
+
   .px-4 {
     padding-inline: calc(var(--spacing) * 4);
   }
@@ -547,6 +590,18 @@
 
   .px-\[5\%\] {
     padding-inline: 5%;
+  }
+
+  .py-0\.5 {
+    padding-block: calc(var(--spacing) * .5);
+  }
+
+  .py-3 {
+    padding-block: calc(var(--spacing) * 3);
+  }
+
+  .py-3\.5 {
+    padding-block: calc(var(--spacing) * 3.5);
   }
 
   .py-4 {
@@ -745,6 +800,10 @@
     .xl\:hidden {
       display: none;
     }
+  }
+
+  .\[\&\>div\>p\:nth-child\(2\)\]\:cursor-pointer > div > p:nth-child(2) {
+    cursor: pointer;
   }
 }
 

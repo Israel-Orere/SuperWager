@@ -1,3 +1,5 @@
+import Aside from "@/components/aside";
+import Navbar from "@/components/navbar";
 import type { Metadata } from "next";
 import "./globals.css";
 
@@ -13,7 +15,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`antialiased`}>{children}</body>
+      <body className={`antialiased`}>
+        <Navbar />
+        <div className="w-full min-h-screen p-[5%] flex gap-16 max-w-screen-2xl mx-auto">
+          <div className="flex-[75%]">{children}</div>
+          <Aside />
+        </div>
+      </body>
     </html>
   );
 }
