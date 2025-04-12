@@ -15,6 +15,7 @@ frontend/!.yarn/releases
 frontend/!.yarn/versions
 frontend/coverage
 frontend/.next
+frontend/.next/
 frontend/out/
 frontend/build
 frontend/.DS_Store

@@ -234,8 +234,14 @@ export default function MatchesTable() {
   }, []);
 
   return (
-    <div className="w-full flex-[75%] flex flex-col gap-4">
-      <h2 className="text-4xl">Football</h2>
+    <div className="w-full flex flex-col gap-4">
+      <div className="w-full flex items-center justify-between">
+        <h2 className="text-4xl">Football</h2>
+
+        <button className="text-lg font-normal bg-[var(--primary)] rounded-lg py-3 px-4 text-white capitalize hover:bg-[var(--primary)]/80">
+          Create Slip
+        </button>
+      </div>
       <div className="flex w-full">
         <div
           className="flex-1 flex items-center justify-center relative p-4 cursor-pointer hover:bg-[var(--primary-light)] transition-all duration-300 ease-in-out"
@@ -354,7 +360,7 @@ export default function MatchesTable() {
                   <span>
                     <FootballPitchIcon />
                   </span>
-                  <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-4 [&>div>p:nth-child(2)]:cursor-pointer">
                     <div className="flex items-center flex-col gap-1 justify-center">
                       <p className="text-sm">1</p>
                       <p className="bg-[var(--primary-light)] p-2.5 rounded-sm">

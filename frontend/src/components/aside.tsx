@@ -18,27 +18,30 @@ import Image from "next/image";
 
 export default function Aside() {
   return (
-    <aside className="h-auto justify-between items-center flex flex-col gap-8">
-      <div className="grid grid-cols-3 items-center gap-10 px-8">
-        <Image src={football} alt="Image of a football" />
-        <Image src={basketball} alt="Image of a basketball" />
-        <Image src={hockey} alt="Image of a hockey" />
-        <Image src={tennis} alt="Image of a tennis" />
-        <Image src={target} alt="Image of a target" />
-        <Image src={volleyball} alt="Image of a volleyball" />
-        <Image src={rugby} alt="Image of a rugby" />
-        <Image src={rugby} alt="Image of a rugby" />
-        <Image src={cricket} alt="Image of a cricket" />
-      </div>
-      <div className="bg-[var(--primary-light)] rounded-[2.25rem] p-9 mt-auto w-full grid grid-cols-4 gap-10">
-        <PeopleIcon />
-        <FrameIcon />
-        <GlobeIcon />
-        <ScrewIcon />
-        <XICon />
-        <LinkedinIcon />
-        <InstagramIcon />
-        <FacebookIcon />
+    <aside className="min-h-screen flex flex-col justify-between">
+      <div></div>
+      <div className="h-full justify-between items-center flex flex-col gap-8">
+        <div className="grid grid-cols-3 items-center gap-10 px-8">
+          <Image src={football} alt="Image of a football" />
+          <Image src={basketball} alt="Image of a basketball" />
+          <Image src={hockey} alt="Image of a hockey" />
+          <Image src={tennis} alt="Image of a tennis" />
+          <Image src={target} alt="Image of a target" />
+          <Image src={volleyball} alt="Image of a volleyball" />
+          <Image src={rugby} alt="Image of a rugby" />
+          <Image src={rugby} alt="Image of a rugby" />
+          <Image src={cricket} alt="Image of a cricket" />
+        </div>
+        <div className="bg-[var(--primary-light)] rounded-[2.25rem] p-9 mt-auto w-full grid grid-cols-4 gap-10">
+          <PeopleIcon />
+          <FrameIcon />
+          <GlobeIcon />
+          <ScrewIcon />
+          <XICon />
+          <LinkedinIcon />
+          <InstagramIcon />
+          <FacebookIcon />
+        </div>
       </div>
     </aside>
   );
