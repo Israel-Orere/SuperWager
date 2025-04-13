@@ -2,6 +2,7 @@
 
 import Analysis from "@/assets/svgs/analysis";
 import FootballPitchIcon from "@/assets/svgs/football-pitch";
+import GreaterThanIcon from "@/assets/svgs/greater-than";
 import { useEffect, useState } from "react";
 
 const footballMatchesData = {
@@ -324,8 +325,8 @@ export default function MatchesTable() {
                       </p>
                     </div>
                   </div>
-                  <span>
-                    <Analysis />
+                  <span className="cursor-pointer">
+                    <GreaterThanIcon />
                   </span>
                 </div>
               </div>
@@ -380,8 +381,184 @@ export default function MatchesTable() {
                       </p>
                     </div>
                   </div>
+                  <span className="cursor-pointer">
+                    <GreaterThanIcon />
+                  </span>
+                </div>
+              </div>
+            ))}
+      </div>
+    </div>
+  );
+}
+
+export function MiniMatchesTable() {
+  const [activeTab, setActiveTab] = useState<"live" | "upcoming">("live");
+
+  const handleTabClick = (tab: "live" | "upcoming") => {
+    setActiveTab(tab);
+  };
+
+  const [matches, setMatches] = useState({
+    liveMatches: footballMatchesData.liveMatches.slice(0, 5),
+    upcomingMatches: footballMatchesData.upcomingMatches.slice(0, 5),
+  });
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setMatches((prev) => ({
+        liveMatches: updateLiveMatches(prev.liveMatches).slice(0, 5),
+        upcomingMatches: prev.upcomingMatches.slice(0, 5),
+      }));
+    }, 60000);
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <div className="w-full flex flex-col gap-4">
+      <div className="w-full flex items-center justify-between">
+        <h2 className="text-4xl">Football</h2>
+      </div>
+      <div className="flex w-full">
+        <div
+          className="flex-1 flex items-center justify-center relative p-4 cursor-pointer hover:bg-[var(--primary-light)] transition-all duration-300 ease-in-out"
+          onClick={() => handleTabClick("live")}
+        >
+          <p
+            className={`text-xl ${
+              activeTab === "live" ? "text-[var(--primary)]" : ""
+            }`}
+          >
+            Live Matches{" "}
+            <span className="text-[#33ff40]">
+              ({matches.liveMatches.length})
+            </span>
+          </p>
+          {activeTab === "live" && (
+            <span className="absolute inset-x-0 bottom-0 h-0.5 bg-[var(--primary)] transition-transform duration-300 transform translate-y-0" />
+          )}
+        </div>
+        <div
+          className="flex-1 flex items-center justify-center relative p-4 cursor-pointer hover:bg-[var(--primary-light)] transition-all duration-300 ease-in-out"
+          onClick={() => handleTabClick("upcoming")}
+        >
+          <p
+            className={`text-xl ${
+              activeTab === "upcoming" ? "text-[var(--primary)]" : ""
+            }`}
+          >
+            Upcoming Matches
+          </p>
+          {activeTab === "upcoming" && (
+            <span className="absolute inset-x-0 bottom-0 h-0.5 bg-[var(--primary)] transition-transform duration-300 transform translate-y-0" />
+          )}
+        </div>
+      </div>
+      <div>
+        {activeTab === "live"
+          ? matches.liveMatches.map((match) => (
+              <div
+                key={match.id}
+                className="w-full px-8 py-6 border-b border-b-[var(--primary)]/30 flex items-center justify-between"
+              >
+                <div className="flex items-center gap-8">
+                  <div className="flex flex-col items-center justify-center text-[#32ff40]">
+                    <span className="text-base">{match.minute}&apos;</span>
+                    <span className="text-sm">
+                      {match.minute < 46 ? "1st" : "2nd"}
+                    </span>
+                  </div>
+                  <div className="text-xl flex flex-col gap-2 justify-center">
+                    <span>{match.homeTeam}</span>
+                    <span>{match.awayTeam}</span>
+                  </div>
+                </div>
+                <div className="flex items-center gap-8">
+                  <div className="text-xl flex flex-col gap-2 items-center justify-center">
+                    <span>{match.score.home}</span>
+                    <span>{match.score.away}</span>
+                  </div>
                   <span>
-                    <Analysis />
+                    <FootballPitchIcon />
+                  </span>
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center flex-col gap-1 justify-center">
+                      <p className="text-sm">1</p>
+                      <p className="bg-[var(--primary-light)] p-2.5 rounded-sm">
+                        {match.odds.home.toFixed(2)}
+                      </p>
+                    </div>
+                    <div className="flex items-center flex-col gap-1 justify-center">
+                      <p className="text-sm">X</p>
+                      <p className="bg-[var(--primary-light)] p-2.5 rounded-sm">
+                        {match.odds.draw.toFixed(2)}
+                      </p>
+                    </div>
+                    <div className="flex items-center flex-col gap-1 justify-center">
+                      <p className="text-sm">2</p>
+                      <p className="bg-[var(--primary-light)] p-2.5 rounded-sm">
+                        {match.odds.away.toFixed(2)}
+                      </p>
+                    </div>
+                  </div>
+                  <span className="cursor-pointer">
+                    <GreaterThanIcon />
+                  </span>
+                </div>
+              </div>
+            ))
+          : matches.upcomingMatches.map((match) => (
+              <div
+                key={match.id}
+                className="w-full px-8 py-6 border-b border-b-[var(--primary)]/30 flex items-center justify-between"
+              >
+                <div className="flex items-center gap-8">
+                  <div className="flex flex-col items-center justify-center">
+                    <p>
+                      {`${new Date(match.startTime)
+                        .getHours()
+                        .toString()
+                        .padStart(2, "0")}:${new Date(match.startTime)
+                        .getMinutes()
+                        .toString()
+                        .padStart(2, "0")}`}
+                    </p>
+                  </div>
+                  <div className="text-xl flex flex-col gap-2 justify-center">
+                    <span>{match.homeTeam}</span>
+                    <span>{match.awayTeam}</span>
+                  </div>
+                </div>
+                <div className="flex items-center gap-8">
+                  <div className="text-xl flex flex-col gap-2 items-center justify-center">
+                    <span>-</span>
+                    <span>-</span>
+                  </div>
+                  <span>
+                    <FootballPitchIcon />
+                  </span>
+                  <div className="flex items-center gap-4 [&>div>p:nth-child(2)]:cursor-pointer">
+                    <div className="flex items-center flex-col gap-1 justify-center">
+                      <p className="text-sm">1</p>
+                      <p className="bg-[var(--primary-light)] p-2.5 rounded-sm">
+                        {match.odds.home.toFixed(2)}
+                      </p>
+                    </div>
+                    <div className="flex items-center flex-col gap-1 justify-center">
+                      <p className="text-sm">X</p>
+                      <p className="bg-[var(--primary-light)] p-2.5 rounded-sm">
+                        {match.odds.draw.toFixed(2)}
+                      </p>
+                    </div>
+                    <div className="flex items-center flex-col gap-1 justify-center">
+                      <p className="text-sm">2</p>
+                      <p className="bg-[var(--primary-light)] p-2.5 rounded-sm">
+                        {match.odds.away.toFixed(2)}
+                      </p>
+                    </div>
+                  </div>
+                  <span className="cursor-pointer">
+                    <GreaterThanIcon />
                   </span>
                 </div>
               </div>

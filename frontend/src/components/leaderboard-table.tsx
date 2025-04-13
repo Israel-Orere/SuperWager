@@ -97,7 +97,10 @@ export default function LeaderboardTable() {
     <div className="flex flex-col items-center justify-center gap-6 bg-[var(--primary-light)] p-6 md:px-8 rounded-2xl">
       <div className="w-full items-center flex justify-between">
         <div className="flex flex-col gap-1">
-          <h2 className="text-3xl font-normal">Weekly Leaderboard</h2>
+          <div className="flex gap-4 items-center">
+            <h2 className="text-3xl font-normal">Weekly Leaderboard</h2>
+            <p className="text-[#32FF40] text-2xl">2D: 06H: 37M: 12S</p>
+          </div>
           <div className="flex items-center gap-4">
             <p className="flex items-center gap-2">
               <span className="size-2.5 bg-[#32ff40] rounded-full" />
@@ -107,10 +110,10 @@ export default function LeaderboardTable() {
           </div>
         </div>
         <div className="flex flex-col gap-1">
-          <h4 className="text-xl font-normal">Pool (USDT)</h4>
+          <h4 className="text-xl font-normal">Pool (STT)</h4>
           <div className="flex items-center justify-center gap-4">
             <LessThan className="size-6 cursor-pointer" />
-            <h4 className="text-2xl font-normal ">5</h4>
+            <h4 className="text-2xl font-normal">0.1</h4>
             <GreaterThan className="size-6 cursor-pointer" />
           </div>
         </div>
