@@ -2,9 +2,11 @@
 
 import { CircleX, Menu } from "lucide-react";
 import { useState } from "react";
+import { useAuthModal } from "@/context/AuthModalContext";
 
 export default function Navbar() {
   const [showNav, setShowNav] = useState(false);
+  const { openModal } = useAuthModal();
 
   return (
     <header className="w-full max-w-screen-2xl mx-auto px-[5%] flex items-center justify-center">
@@ -33,7 +35,10 @@ export default function Navbar() {
           ))}
         </nav>
         <div className="hidden xl:flex items-center gap-4">
-          <button className="bg-white border-[var(--primary)] border-[2px] rounded-[4px] text-[var(--primary)] p-2.5 px-4 font-medium text-base transition-all cursor-pointer hover:bg-white/80">
+          <button
+            onClick={openModal}
+            className="bg-white border-[var(--primary)] border-[2px] rounded-[4px] text-[var(--primary)] p-2.5 px-4 font-medium text-base transition-all cursor-pointer hover:bg-white/80"
+          >
             Log in
           </button>
         </div>
@@ -75,7 +80,10 @@ export default function Navbar() {
             ))}
           </nav>
           <div className="flex xl:hidden flex-col items-center gap-4">
-            <button className="bg-transparent rounded-[4px] border text-[var(--primary)] border-[var(--primary)] p-2.5 px-4 font-medium cursor-pointer text-sm transition-all">
+            <button
+              onClick={openModal}
+              className="bg-transparent rounded-[4px] border text-[var(--primary)] border-[var(--primary)] p-2.5 px-4 font-medium cursor-pointer text-sm transition-all"
+            >
               Login
             </button>
           </div>

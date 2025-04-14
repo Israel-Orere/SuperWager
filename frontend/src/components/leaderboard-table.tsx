@@ -2,6 +2,7 @@
 
 import GreaterThan from "@/assets/svgs/double-greaterthan";
 import LessThan from "@/assets/svgs/double-lessthan";
+import { useAuthModal } from "@/context/AuthModalContext";
 import { useEffect, useState } from "react";
 
 const mockData = [
@@ -87,6 +88,7 @@ const simulateUpdates = (
 
 export default function LeaderboardTable() {
   const [leaderboardData, setLeaderboardData] = useState(mockData);
+  const { openModal } = useAuthModal();
 
   useEffect(() => {
     const intervalId = simulateUpdates(mockData, setLeaderboardData);
@@ -161,7 +163,10 @@ export default function LeaderboardTable() {
         </tbody>
       </table>
       <div>
-        <button className="text-lg font-normal bg-[var(--primary)] rounded-lg p-3.5 text-white capitalize hover:bg-[var(--primary)]/80">
+        <button
+          onClick={openModal}
+          className="text-lg font-normal bg-[var(--primary)] rounded-lg p-3.5 text-white capitalize hover:bg-[var(--primary)]/80"
+        >
           See Full Leaderboard
         </button>
       </div>

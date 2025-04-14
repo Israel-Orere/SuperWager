@@ -21,3 +21,6 @@ body {
 button {
   @apply transition-all duration-300 ease-in-out cursor-pointer;
 }
+input {
+  @apply border-[var(--primary)] border-3;
+}
