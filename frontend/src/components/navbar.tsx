@@ -22,7 +22,7 @@ export default function Navbar() {
             "Player Support",
             "Contact",
             "Language",
-            "Enter game",
+            "Create Slip",
           ].map((item, i) => (
             <p
               key={i}
