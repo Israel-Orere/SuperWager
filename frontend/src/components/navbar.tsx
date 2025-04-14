@@ -28,7 +28,7 @@ export default function Navbar() {
             <Link
               href={item.href}
               key={i}
-              className="font-medium text-base cursor-pointer text-black"
+              className="font-medium text-base cursor-pointer text-black hover:text-[var(--primary)]"
             >
               {item.label}
             </Link>
@@ -71,7 +71,7 @@ export default function Navbar() {
               <Link
                 href={item.href}
                 key={i}
-                className="font-medium text-base cursor-pointer text-black"
+                className="font-medium text-base cursor-pointer text-black hover:text-[var(--primary)]"
               >
                 {item.label}
               </Link>

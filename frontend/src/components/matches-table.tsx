@@ -7,6 +7,7 @@ import {
   BettingSlips,
   useBettingSlips,
 } from "@/context/useBettingSlips";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -221,6 +222,8 @@ const updateLiveMatches = (matches: typeof footballMatchesData.liveMatches) => {
 };
 
 export default function MatchesTable() {
+  const router = useRouter();
+
   const [activeTab, setActiveTab] = useState<"live" | "upcoming">("live");
   const [matches, setMatches] = useState(footballMatchesData);
 
@@ -282,7 +285,10 @@ export default function MatchesTable() {
 
     addSlip({ slip, id: Date.now().toString() });
     setSlip([]);
-    toast.success("Slip created");
+
+    toast.success("Slip successfully created");
+
+    router.push("/betting-slips");
   };
 
   return (
@@ -299,7 +305,7 @@ export default function MatchesTable() {
       </div>
       <div className="flex w-full">
         <div
-          className="flex-1 flex items-center justify-center relative p-4 cursor-pointer hover:bg-[var(--primary-light)] transition-all duration-300 ease-in-out"
+          className="flex-1 flex items-center justify-center relative p-4 cursor-pointer hover:bg-[var(--primary-light)]"
           onClick={() => handleTabClick("live")}
         >
           <p
@@ -317,7 +323,7 @@ export default function MatchesTable() {
           )}
         </div>
         <div
-          className="flex-1 flex items-center justify-center relative p-4 cursor-pointer hover:bg-[var(--primary-light)] transition-all duration-300 ease-in-out"
+          className="flex-1 flex items-center justify-center relative p-4 cursor-pointer hover:bg-[var(--primary-light)]"
           onClick={() => handleTabClick("upcoming")}
         >
           <p
@@ -579,7 +585,7 @@ export function MiniMatchesTable() {
       </div>
       <div className="flex w-full">
         <div
-          className="flex-1 flex items-center justify-center relative p-4 cursor-pointer hover:bg-[var(--primary-light)] transition-all duration-300 ease-in-out"
+          className="flex-1 flex items-center justify-center relative p-4 cursor-pointer hover:bg-[var(--primary-light)]"
           onClick={() => handleTabClick("live")}
         >
           <p
@@ -597,7 +603,7 @@ export function MiniMatchesTable() {
           )}
         </div>
         <div
-          className="flex-1 flex items-center justify-center relative p-4 cursor-pointer hover:bg-[var(--primary-light)] transition-all duration-300 ease-in-out"
+          className="flex-1 flex items-center justify-center relative p-4 cursor-pointer hover:bg-[var(--primary-light)]"
           onClick={() => handleTabClick("upcoming")}
         >
           <p

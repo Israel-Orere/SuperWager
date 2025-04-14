@@ -1,0 +1,45 @@
+export default function RedXIcon(props: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      {...props}
+      width="29"
+      height="28"
+      viewBox="0 0 29 28"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <rect
+        x="1.83594"
+        y="1.11646"
+        width="26.0467"
+        height="25.0233"
+        fill="#F9070B"
+        fillOpacity="0.1"
+      />
+      <rect
+        x="1.83594"
+        y="1.11646"
+        width="26.0467"
+        height="25.0233"
+        stroke="#F9070B"
+        strokeWidth="2"
+      />
+      <line
+        x1="7.66399"
+        y1="19.9211"
+        x2="21.664"
+        y2="5.92107"
+        stroke="#F9070B"
+        strokeWidth="2"
+      />
+      <line
+        x1="8.05476"
+        y1="5.92107"
+        x2="22.0548"
+        y2="19.9211"
+        stroke="#F9070B"
+        strokeWidth="2"
+      />
+    </svg>
+  );
+}
