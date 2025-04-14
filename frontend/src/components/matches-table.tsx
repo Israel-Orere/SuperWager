@@ -1,9 +1,14 @@
 "use client";
 
-import Analysis from "@/assets/svgs/analysis";
 import FootballPitchIcon from "@/assets/svgs/football-pitch";
 import GreaterThanIcon from "@/assets/svgs/greater-than";
+import {
+  BettingSlip,
+  BettingSlips,
+  useBettingSlips,
+} from "@/context/useBettingSlips";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 const footballMatchesData = {
   liveMatches: [
@@ -93,70 +98,70 @@ const footballMatchesData = {
       id: 11,
       homeTeam: "Man United",
       awayTeam: "Aston Villa",
-      startTime: "2023-11-12T15:00:00",
+      startTime: "2025-11-12T15:00:00",
       odds: { home: 1.9, draw: 3.6, away: 4.0 },
     },
     {
       id: 12,
       homeTeam: "Roma",
       awayTeam: "Lazio",
-      startTime: "2023-11-12T18:00:00",
+      startTime: "2025-11-12T18:00:00",
       odds: { home: 2.4, draw: 3.2, away: 3.0 },
     },
     {
       id: 13,
       homeTeam: "Porto",
       awayTeam: "Benfica",
-      startTime: "2023-11-11T20:30:00",
+      startTime: "2025-11-11T20:30:00",
       odds: { home: 2.7, draw: 3.1, away: 2.8 },
     },
     {
       id: 14,
       homeTeam: "Ajax",
       awayTeam: "Feyenoord",
-      startTime: "2023-11-12T13:30:00",
+      startTime: "2025-11-12T13:30:00",
       odds: { home: 2.2, draw: 3.5, away: 3.2 },
     },
     {
       id: 15,
       homeTeam: "Celtic",
       awayTeam: "Rangers",
-      startTime: "2023-11-11T12:00:00",
+      startTime: "2025-11-11T12:00:00",
       odds: { home: 2.1, draw: 3.3, away: 3.6 },
     },
     {
       id: 16,
       homeTeam: "Boca Juniors",
       awayTeam: "River Plate",
-      startTime: "2023-11-13T22:00:00",
+      startTime: "2025-11-13T22:00:00",
       odds: { home: 2.5, draw: 3.0, away: 3.0 },
     },
     {
       id: 17,
       homeTeam: "Galatasaray",
       awayTeam: "Fenerbahçe",
-      startTime: "2023-11-12T19:00:00",
+      startTime: "2025-11-12T19:00:00",
       odds: { home: 2.3, draw: 3.4, away: 3.1 },
     },
     {
       id: 18,
       homeTeam: "LA Galaxy",
       awayTeam: "LAFC",
-      startTime: "2023-11-13T03:30:00",
+      startTime: "2025-11-13T03:30:00",
       odds: { home: 3.2, draw: 3.5, away: 2.2 },
     },
     {
       id: 19,
       homeTeam: "Flamengo",
       awayTeam: "Palmeiras",
-      startTime: "2023-11-14T23:00:00",
+      startTime: "2025-11-14T23:00:00",
       odds: { home: 2.1, draw: 3.2, away: 3.7 },
     },
     {
       id: 20,
       homeTeam: "Al Hilal",
       awayTeam: "Al Nassr",
-      startTime: "2023-11-11T17:00:00",
+      startTime: "2025-11-11T17:00:00",
       odds: { home: 2.6, draw: 3.3, away: 2.7 },
     },
   ],
@@ -217,12 +222,11 @@ const updateLiveMatches = (matches: typeof footballMatchesData.liveMatches) => {
 
 export default function MatchesTable() {
   const [activeTab, setActiveTab] = useState<"live" | "upcoming">("live");
+  const [matches, setMatches] = useState(footballMatchesData);
 
   const handleTabClick = (tab: "live" | "upcoming") => {
     setActiveTab(tab);
   };
-
-  const [matches, setMatches] = useState(footballMatchesData);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -234,12 +238,62 @@ export default function MatchesTable() {
     return () => clearInterval(interval);
   }, []);
 
+  useEffect(() => {
+    toast.info("Select upcoming matches to create slip");
+  }, []);
+
+  const { addSlip } = useBettingSlips();
+
+  const [slip, setSlip] = useState<BettingSlip[]>([]);
+
+  const addToSlip = (match: BettingSlip) => {
+    if (
+      slip.some(
+        (s) => s.homeTeam === match.homeTeam && s.awayTeam === match.awayTeam
+      )
+    ) {
+      toast.error("Match already in slip");
+      return;
+    }
+
+    setSlip((prev) => [...prev, match]);
+
+    toast.success("Match added to slip");
+  };
+
+  const removeFromSlip = (
+    match: Pick<BettingSlip, "awayTeam" | "homeTeam" | "selection">
+  ) => {
+    setSlip((prev) =>
+      prev.filter(
+        (s) =>
+          s.homeTeam !== match.homeTeam &&
+          s.awayTeam !== match.awayTeam &&
+          s.selection !== match.selection
+      )
+    );
+  };
+
+  const createSlip = () => {
+    if (!slip.length) {
+      toast.error("No matches in slip");
+      return;
+    }
+
+    addSlip({ slip, id: Date.now().toString() });
+    setSlip([]);
+    toast.success("Slip created");
+  };
+
   return (
     <div className="w-full flex flex-col gap-4">
       <div className="w-full flex items-center justify-between">
         <h2 className="text-4xl">Football</h2>
 
-        <button className="text-lg font-normal bg-[var(--primary)] rounded-lg py-3 px-4 text-white capitalize hover:bg-[var(--primary)]/80">
+        <button
+          onClick={createSlip}
+          className="text-lg font-normal bg-[var(--primary)] rounded-lg py-3 px-4 text-white capitalize hover:bg-[var(--primary)]/80"
+        >
           Create Slip
         </button>
       </div>
@@ -364,19 +418,115 @@ export default function MatchesTable() {
                   <div className="flex items-center gap-4 [&>div>p:nth-child(2)]:cursor-pointer">
                     <div className="flex items-center flex-col gap-1 justify-center">
                       <p className="text-sm">1</p>
-                      <p className="bg-[var(--primary-light)] p-2.5 rounded-sm">
+                      <p
+                        className={`${
+                          slip.find(
+                            (item) =>
+                              item.homeTeam === match.homeTeam &&
+                              item.awayTeam === match.awayTeam &&
+                              item.selection === "home"
+                          )
+                            ? "bg-[var(--primary)] text-white"
+                            : "bg-[var(--primary-light)]"
+                        } p-2.5 rounded-sm`}
+                        onClick={() => {
+                          slip.find(
+                            (item) =>
+                              item.homeTeam === match.homeTeam &&
+                              item.awayTeam === match.awayTeam &&
+                              item.selection === "home"
+                          )
+                            ? removeFromSlip({
+                                awayTeam: match.awayTeam,
+                                homeTeam: match.homeTeam,
+                                selection: "home",
+                              })
+                            : addToSlip({
+                                awayTeam: match.awayTeam,
+                                homeTeam: match.homeTeam,
+                                matchDate: new Date(match.startTime).toString(),
+                                odds: match.odds.home,
+                                outcome: "pending",
+                                selection: "home",
+                              });
+                        }}
+                      >
                         {match.odds.home.toFixed(2)}
                       </p>
                     </div>
                     <div className="flex items-center flex-col gap-1 justify-center">
                       <p className="text-sm">X</p>
-                      <p className="bg-[var(--primary-light)] p-2.5 rounded-sm">
+                      <p
+                        className={`${
+                          slip.find(
+                            (item) =>
+                              item.homeTeam === match.homeTeam &&
+                              item.awayTeam === match.awayTeam &&
+                              item.selection === "draw"
+                          )
+                            ? "bg-[var(--primary)] text-white"
+                            : "bg-[var(--primary-light)]"
+                        } p-2.5 rounded-sm`}
+                        onClick={() => {
+                          slip.find(
+                            (item) =>
+                              item.homeTeam === match.homeTeam &&
+                              item.awayTeam === match.awayTeam &&
+                              item.selection === "draw"
+                          )
+                            ? removeFromSlip({
+                                awayTeam: match.awayTeam,
+                                homeTeam: match.homeTeam,
+                                selection: "draw",
+                              })
+                            : addToSlip({
+                                awayTeam: match.awayTeam,
+                                homeTeam: match.homeTeam,
+                                matchDate: new Date(match.startTime).toString(),
+                                odds: match.odds.draw,
+                                outcome: "pending",
+                                selection: "draw",
+                              });
+                        }}
+                      >
                         {match.odds.draw.toFixed(2)}
                       </p>
                     </div>
                     <div className="flex items-center flex-col gap-1 justify-center">
                       <p className="text-sm">2</p>
-                      <p className="bg-[var(--primary-light)] p-2.5 rounded-sm">
+                      <p
+                        className={`${
+                          slip.find(
+                            (item) =>
+                              item.homeTeam === match.homeTeam &&
+                              item.awayTeam === match.awayTeam &&
+                              item.selection === "away"
+                          )
+                            ? "bg-[var(--primary)] text-white"
+                            : "bg-[var(--primary-light)]"
+                        } p-2.5 rounded-sm`}
+                        onClick={() => {
+                          slip.find(
+                            (item) =>
+                              item.homeTeam === match.homeTeam &&
+                              item.awayTeam === match.awayTeam &&
+                              item.selection === "away"
+                          )
+                            ? removeFromSlip({
+                                awayTeam: match.awayTeam,
+                                homeTeam: match.homeTeam,
+                                selection: "away",
+                              })
+                            : addToSlip({
+                                awayTeam: match.awayTeam,
+                                homeTeam: match.homeTeam,
+                                matchDate: new Date(match.startTime).toString(),
+                                odds: match.odds.away,
+                                outcome: "pending",
+                                selection: "away",
+                              });
+                        }}
+                      >
                         {match.odds.away.toFixed(2)}
                       </p>
                     </div>
@@ -387,6 +537,14 @@ export default function MatchesTable() {
                 </div>
               </div>
             ))}
+      </div>
+      <div className="flex items-center justify-center mt-6">
+        <button
+          onClick={createSlip}
+          className="text-lg font-normal bg-[var(--primary)] rounded-lg py-3 px-4 text-white capitalize hover:bg-[var(--primary)]/80"
+        >
+          Create Slip
+        </button>
       </div>
     </div>
   );

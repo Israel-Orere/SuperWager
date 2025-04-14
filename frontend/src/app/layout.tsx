@@ -1,6 +1,8 @@
 import Aside from "@/components/aside";
 import Navbar from "@/components/navbar";
+import { BettingSlipsProvider } from "@/context/useBettingSlips";
 import type { Metadata } from "next";
+import { Toaster } from "sonner";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -16,11 +18,14 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`antialiased`}>
-        <Navbar />
-        <div className="w-full min-h-screen p-[5%] flex gap-16 max-w-screen-2xl mx-auto">
-          <div className="flex-[75%]">{children}</div>
-          <Aside />
-        </div>
+        <Toaster richColors position="top-right" />
+        <BettingSlipsProvider>
+          <Navbar />
+          <div className="w-full min-h-screen p-[5%] flex gap-16 max-w-screen-2xl mx-auto">
+            <div className="flex-[75%]">{children}</div>
+            <Aside />
+          </div>
+        </BettingSlipsProvider>
       </body>
     </html>
   );
