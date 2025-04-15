@@ -701,7 +701,7 @@ export function MiniMatchesTable() {
                   <span>
                     <FootballPitchIcon />
                   </span>
-                  <div className="flex items-center gap-4 [&>div>p:nth-child(2)]:cursor-pointer">
+                  <div className="flex items-center gap-4">
                     <div className="flex items-center flex-col gap-1 justify-center">
                       <p className="text-sm">1</p>
                       <p className="bg-[var(--primary-light)] p-2.5 rounded-sm">
