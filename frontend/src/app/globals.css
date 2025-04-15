@@ -22,3 +22,6 @@ body {
 button {
   @apply cursor-pointer;
 }
+input {
+  @apply border-[var(--primary)] border-3;
+}
