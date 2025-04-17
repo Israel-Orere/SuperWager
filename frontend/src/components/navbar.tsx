@@ -1,6 +1,7 @@
 "use client";
 
 import { CircleX, Menu } from "lucide-react";
+import Link from "next/link";
 import { useState } from "react";
 import { useAuthModal } from "@/context/AuthModalContext";
 
@@ -18,20 +19,21 @@ export default function Navbar() {
         </div>
         <nav className="hidden xl:flex gap-6 items-center justify-center">
           {[
-            "Sports",
-            "Live Matches",
-            "Leaderboard",
-            "Player Support",
-            "Contact",
-            "Language",
-            "Enter game",
+            { label: "Sports", href: "/sports" },
+            { label: "Live Matches", href: "/live-matches" },
+            { label: "Leaderboard", href: "/leaderboard" },
+            { label: "Player Support", href: "/player-support" },
+            { label: "Contact", href: "/contact" },
+            { label: "Language", href: "/language" },
+            { label: "Create Slip", href: "/create-slip" },
           ].map((item, i) => (
-            <p
+            <Link
+              href={item.href}
               key={i}
-              className="font-medium text-base cursor-pointer text-black"
+              className="font-medium text-base cursor-pointer text-black hover:text-[var(--primary)]"
             >
-              {item}
-            </p>
+              {item.label}
+            </Link>
           ))}
         </nav>
         <div className="hidden xl:flex items-center gap-4">
@@ -63,20 +65,21 @@ export default function Navbar() {
           </span>
           <nav className="flex flex-col w-full items-center justify-center border-t border-t-[var(--primary)]/20">
             {[
-              "Sports",
-              "Live Matches",
-              "Leaderboard",
-              "Player Support",
-              "Contact",
-              "Language",
-              "Enter game",
+              { label: "Sports", href: "/sports" },
+              { label: "Live Matches", href: "/live-matches" },
+              { label: "Leaderboard", href: "/leaderboard" },
+              { label: "Player Support", href: "/player-support" },
+              { label: "Contact", href: "/contact" },
+              { label: "Language", href: "/language" },
+              { label: "Create Slip", href: "/create-slip" },
             ].map((item, i) => (
-              <p
+              <Link
+                href={item.href}
                 key={i}
-                className="font-medium p-4 text-center border-b border-[var(--primary)]/20 w-full text-base cursor-pointer text-black"
+                className="font-medium text-base cursor-pointer text-black hover:text-[var(--primary)]"
               >
-                {item}
-              </p>
+                {item.label}
+              </Link>
             ))}
           </nav>
           <div className="flex xl:hidden flex-col items-center gap-4">
