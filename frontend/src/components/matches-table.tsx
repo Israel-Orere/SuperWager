@@ -2,12 +2,8 @@
 
 import FootballPitchIcon from "@/assets/svgs/football-pitch";
 import GreaterThanIcon from "@/assets/svgs/greater-than";
-import {
-  BettingSlip,
-  BettingSlips,
-  useBettingSlips,
-} from "@/context/useBettingSlips";
-import { useRouter } from "next/navigation";
+import { BettingSlip, useBettingSlips } from "@/context/useBettingSlips";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -223,12 +219,17 @@ const updateLiveMatches = (matches: typeof footballMatchesData.liveMatches) => {
 
 export default function MatchesTable() {
   const router = useRouter();
+  const params = useSearchParams();
 
-  const [activeTab, setActiveTab] = useState<"live" | "upcoming">("live");
+  const [activeTab, setActiveTab] = useState<"live" | "upcoming">(
+    (params.get("tab") as "live" | "upcoming") || "live"
+  );
+
   const [matches, setMatches] = useState(footballMatchesData);
 
   const handleTabClick = (tab: "live" | "upcoming") => {
     setActiveTab(tab);
+    router.replace("/create-slip");
   };
 
   useEffect(() => {
@@ -245,13 +246,17 @@ export default function MatchesTable() {
     toast.info("Select upcoming matches to create slip");
   }, []);
 
-  const { addSlip } = useBettingSlips();
-
-  const [slip, setSlip] = useState<BettingSlip[]>([]);
+  const { addSlip, removeSlip, slips, hasPoolStarted, setPoolId } =
+    useBettingSlips();
 
   const addToSlip = (match: BettingSlip) => {
+    if (hasPoolStarted) {
+      toast.error("You cannot make changes to the pool");
+      return;
+    }
+
     if (
-      slip.some(
+      slips.some(
         (s) => s.homeTeam === match.homeTeam && s.awayTeam === match.awayTeam
       )
     ) {
@@ -259,32 +264,25 @@ export default function MatchesTable() {
       return;
     }
 
-    setSlip((prev) => [...prev, match]);
-
-    toast.success("Match added to slip");
+    addSlip(match);
   };
 
-  const removeFromSlip = (
-    match: Pick<BettingSlip, "awayTeam" | "homeTeam" | "selection">
-  ) => {
-    setSlip((prev) =>
-      prev.filter(
-        (s) =>
-          s.homeTeam !== match.homeTeam &&
-          s.awayTeam !== match.awayTeam &&
-          s.selection !== match.selection
-      )
-    );
+  const removeFromSlip = (slip: Partial<BettingSlip>) => {
+    if (hasPoolStarted) {
+      toast.error("You cannot make changes to the pool");
+      return;
+    }
+
+    removeSlip(slip as BettingSlip);
   };
 
   const createSlip = () => {
-    if (!slip.length) {
+    if (!slips.length) {
       toast.error("No matches in slip");
       return;
     }
 
-    addSlip({ slip, id: Date.now().toString() });
-    setSlip([]);
+    setPoolId(Date.now().toString());
 
     toast.success("Slip successfully created");
 
@@ -426,7 +424,7 @@ export default function MatchesTable() {
                       <p className="text-sm">1</p>
                       <p
                         className={`${
-                          slip.find(
+                          slips.find(
                             (item) =>
                               item.homeTeam === match.homeTeam &&
                               item.awayTeam === match.awayTeam &&
@@ -436,7 +434,7 @@ export default function MatchesTable() {
                             : "bg-[var(--primary-light)]"
                         } p-2.5 rounded-sm`}
                         onClick={() => {
-                          slip.find(
+                          slips.find(
                             (item) =>
                               item.homeTeam === match.homeTeam &&
                               item.awayTeam === match.awayTeam &&
@@ -464,7 +462,7 @@ export default function MatchesTable() {
                       <p className="text-sm">X</p>
                       <p
                         className={`${
-                          slip.find(
+                          slips.find(
                             (item) =>
                               item.homeTeam === match.homeTeam &&
                               item.awayTeam === match.awayTeam &&
@@ -474,7 +472,7 @@ export default function MatchesTable() {
                             : "bg-[var(--primary-light)]"
                         } p-2.5 rounded-sm`}
                         onClick={() => {
-                          slip.find(
+                          slips.find(
                             (item) =>
                               item.homeTeam === match.homeTeam &&
                               item.awayTeam === match.awayTeam &&
@@ -502,7 +500,7 @@ export default function MatchesTable() {
                       <p className="text-sm">2</p>
                       <p
                         className={`${
-                          slip.find(
+                          slips.find(
                             (item) =>
                               item.homeTeam === match.homeTeam &&
                               item.awayTeam === match.awayTeam &&
@@ -512,7 +510,7 @@ export default function MatchesTable() {
                             : "bg-[var(--primary-light)]"
                         } p-2.5 rounded-sm`}
                         onClick={() => {
-                          slip.find(
+                          slips.find(
                             (item) =>
                               item.homeTeam === match.homeTeam &&
                               item.awayTeam === match.awayTeam &&
