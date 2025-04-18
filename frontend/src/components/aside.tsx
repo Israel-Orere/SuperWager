@@ -6,70 +6,21 @@ import rugby from "@/assets/images/rugby.png";
 import target from "@/assets/images/target.png";
 import tennis from "@/assets/images/tennis.png";
 import volleyball from "@/assets/images/volleyball.png";
-import EditIcon from "@/assets/svgs/edit-icon";
 import FacebookIcon from "@/assets/svgs/facebook";
 import FrameIcon from "@/assets/svgs/frame";
 import GlobeIcon from "@/assets/svgs/globe";
-import HistoryIcon from "@/assets/svgs/history-icon";
 import InstagramIcon from "@/assets/svgs/instagram";
 import LinkedinIcon from "@/assets/svgs/linkedin";
 import PeopleIcon from "@/assets/svgs/people";
-import PlayIcon from "@/assets/svgs/play-button";
 import ScrewIcon from "@/assets/svgs/screw";
-import TicketIcon from "@/assets/svgs/ticket-icon";
 import XICon from "@/assets/svgs/twitter";
-import WalletIcon from "@/assets/svgs/wallet-icon";
 import Image from "next/image";
-import Link from "next/link";
-import pfp from "@/assets/images/default.png";
+import UserCard from "./user-card";
 
 export default function Aside() {
   return (
     <aside className="min-h-screen flex flex-col space-y-16 justify-between">
-      <div className="w-full flex flex-col items-center justify-center space-y-4">
-        <div className="w-full flex items-center justify-center flex-col gap-4 aspect-square bg-[var(--primary)] p-12 rounded-2xl relative text-white">
-          <span className="absolute top-4 right-4 cursor-pointer p-0.5 border-[2px] border-white rounded-full">
-            <EditIcon className="stroke-white stroke-2" />
-          </span>
-
-          <div className="size-[100px] flex items-center justify-center bg-white rounded-full overflow-hidden">
-            <Image src={pfp} alt="Profile Image" />
-          </div>
-          <p className="">User</p>
-          <div className="w-full flex items-center justify-between">
-            <p>0.1 SST Pool</p>
-            <p>Point: -</p>
-          </div>
-          <p>Rank: -</p>
-        </div>
-        <div className="grid gap-x-16 gap-y-8 p-8 grid-cols-2 items-center text-[var(--primary)]">
-          <div className="flex flex-col gap-4 items-center cursor-pointer">
-            <WalletIcon />
-            <p>Wallet</p>
-          </div>
-          <Link
-            href={"/betting-slips"}
-            className="flex flex-col gap-4 items-center"
-          >
-            <TicketIcon />
-            <p>Bet Slip</p>
-          </Link>
-          <Link
-            href={"/create-slip"}
-            className="flex flex-col gap-4 items-center"
-          >
-            <PlayIcon />
-            <p>Bet Slip</p>
-          </Link>
-          <Link
-            href={"/transaction-history"}
-            className="flex flex-col gap-4 items-center"
-          >
-            <HistoryIcon />
-            <p>Bet Slip</p>
-          </Link>
-        </div>
-      </div>
+      <UserCard />
       <div className="h-full justify-between items-center flex flex-col gap-8">
         <div className="grid grid-cols-3 items-center gap-10 px-8">
           <Image src={football} alt="Image of a football" />
