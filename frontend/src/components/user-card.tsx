@@ -98,14 +98,14 @@ export default function UserCard() {
             className="flex flex-col gap-4 items-center"
           >
             <PlayIcon />
-            <p>Bet Slip</p>
+            <p>Create Slip</p>
           </Link>
           <Link
             href={"/transaction-history"}
             className="flex flex-col gap-4 items-center"
           >
             <HistoryIcon />
-            <p>Bet Slip</p>
+            <p>Transaction History</p>
           </Link>
         </div>
       </div>
