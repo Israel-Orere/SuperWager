@@ -1,4 +1,4 @@
-export const buildGamesUrl = (league_key: LeagueKey) => {
+export const buildOddsUrl = (league_key: LeagueKey) => {
   const baseUrl = `https://api.the-odds-api.com/v4/sports/${league_key}/odds`;
 
   const params = {
@@ -24,3 +24,6 @@ export const buildGamesUrl = (league_key: LeagueKey) => {
 
   return `${baseUrl}?${queryString}`;
 };
+
+export const buildScoresUrl = (league_key: LeagueKey) =>
+  `https://api.the-odds-api.com/v4/sports/${league_key}/scores?apiKey=${process.env.NEXT_PUBLIC_ODDS_API_KEY}&dateFormat=iso`;

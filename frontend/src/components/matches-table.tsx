@@ -4,13 +4,13 @@ import FootballPitchIcon from "@/assets/svgs/football-pitch";
 import GreaterThanIcon from "@/assets/svgs/greater-than";
 import { BettingSlip, useBettingSlips } from "@/context/useBettingSlips";
 import { leagues } from "@/utils/constant";
-import { buildGamesUrl } from "@/utils/utils";
+import { buildOddsUrl, buildScoresUrl } from "@/utils/utils";
 import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import axios from "axios";
-import { AlignLeft, ArrowLeft, ArrowRight, MoveLeft } from "lucide-react";
 import Loader from "./loader";
 
 const footballMatchesData = {
@@ -227,9 +227,10 @@ export default function MatchesTable() {
   const router = useRouter();
   const params = useSearchParams();
 
-  const [activeTab, setActiveTab] = useState<"live" | "upcoming">(
-    (params.get("tab") as "live" | "upcoming") || "live"
-  );
+  // const [activeTab, setActiveTab] = useState<"live" | "upcoming">(
+  //   (params.get("tab") as "live" | "upcoming") || "live"
+  // );
+
   const [league, setLeague] = useState<number>(0);
   const next = () => {
     if (league === leagues.length - 1) setLeague(0);
@@ -248,16 +249,24 @@ export default function MatchesTable() {
     queryKey: ["matches", leagues[league].key],
     queryFn: async () =>
       await axios
-        .get(buildGamesUrl(leagues[league].key))
+        .get(buildOddsUrl(leagues[league].key))
         .then((res) => res.data),
+  });
+  const { data: scores = [] } = useQuery<ScoresDataType[]>({
+    queryKey: ["scores", leagues[league].key],
+    queryFn: async () =>
+      await axios
+        .get(buildScoresUrl(leagues[league].key))
+        .then((res) => res.data),
+    // staleTime: 10000,
   });
 
   // const [matches, setMatches] = useState(footballMatchesData);
 
-  const handleTabClick = (tab: "live" | "upcoming") => {
-    setActiveTab(tab);
-    router.replace("/create-slip");
-  };
+  // const handleTabClick = (tab: "live" | "upcoming") => {
+  //   setActiveTab(tab);
+  //   router.replace("/create-slip");
+  // };
 
   // useEffect(() => {
   //   const interval = setInterval(() => {
@@ -393,30 +402,39 @@ export default function MatchesTable() {
       )}
 
       <div>
-        {matches.map((match) => (
+        {matches.map((match, i) => (
           <div
             key={match.id}
             className="w-full px-8 py-6 border-b border-b-[var(--primary)]/30 flex items-center justify-between"
           >
             <div className="flex items-center gap-8">
               <div className="flex flex-col items-center justify-center">
-                <p className="flex flex-col items-center justify-center gap-1">
-                  <span>
-                    {new Date(match.commence_time).toLocaleDateString("en-GB", {
-                      day: "2-digit",
-                      month: "2-digit",
-                      year: "2-digit",
-                    })}
-                  </span>
-                  <span>
-                    {`${new Date(match.commence_time)
-                      .getHours()
-                      .toString()
-                      .padStart(2, "0")}:${new Date(match.commence_time)
-                      .getMinutes()
-                      .toString()
-                      .padStart(2, "0")}`}
-                  </span>
+                <p className="flex flex-col items-center justify-center gap-1 w-20">
+                  {new Date(match.commence_time) < new Date() ? (
+                    <span className="size-2 rounded-full bg-[#32ff40]" />
+                  ) : (
+                    <>
+                      <span>
+                        {new Date(match.commence_time).toLocaleDateString(
+                          "en-GB",
+                          {
+                            day: "2-digit",
+                            month: "2-digit",
+                            year: "2-digit",
+                          }
+                        )}
+                      </span>
+                      <span>
+                        {`${new Date(match.commence_time)
+                          .getHours()
+                          .toString()
+                          .padStart(2, "0")}:${new Date(match.commence_time)
+                          .getMinutes()
+                          .toString()
+                          .padStart(2, "0")}`}
+                      </span>
+                    </>
+                  )}
                 </p>
               </div>
               <div className="text-xl flex flex-col gap-2 justify-center">
@@ -426,8 +444,16 @@ export default function MatchesTable() {
             </div>
             <div className="flex items-center gap-8">
               <div className="text-xl flex flex-col gap-2 items-center justify-center">
-                <span>-</span>
-                <span>-</span>
+                <span>
+                  {scores[i].scores?.find(
+                    (item) => item.name === match.home_team
+                  )?.score || "-"}
+                </span>
+                <span>
+                  {scores[i].scores?.find(
+                    (item) => item.name === match.away_team
+                  )?.score || "-"}
+                </span>
               </div>
               <span>
                 <FootballPitchIcon />
@@ -774,14 +800,14 @@ export default function MatchesTable() {
               </div>
             ))}
       </div> */}
-      <div className="flex items-center justify-center mt-6">
+      {/* <div className="flex items-center justify-center mt-6">
         <button
           onClick={createSlip}
           className="text-lg font-normal bg-[var(--primary)] rounded-lg py-3 px-4 text-white capitalize hover:bg-[var(--primary)]/80"
         >
           Create Slip
         </button>
-      </div>
+      </div> */}
     </div>
   );
 }

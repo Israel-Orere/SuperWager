@@ -126,7 +126,7 @@ export default function LeaderboardTable() {
             <th className="p-2 font-normal text-center">Position</th>
             <th className="p-2 font-normal text-center">Players</th>
             <th className="p-2 font-normal text-center">
-              Total Odds <span className="text-black/50">(Point)</span>
+              Odds Won <span className="text-black/50">(Point)</span>
             </th>
             <th className="p-2 font-normal text-center">
               Accuracy <span className="text-black/50">(Point)</span>

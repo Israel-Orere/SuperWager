@@ -1,3 +1,16 @@
+interface ScoresDataType {
+  id: string;
+  completed: boolean;
+  home_team: string;
+  away_team: string;
+  scores: EnhancedTeamScore[] | null;
+}
+
+interface EnhancedTeamScore {
+  name: string;
+  score: string;
+}
+
 interface MatchesType {
   id: string;
   sport_key: string;
