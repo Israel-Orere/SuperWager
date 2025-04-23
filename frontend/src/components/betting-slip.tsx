@@ -98,21 +98,24 @@ export default function BettingSlip() {
             <p className="flex gap-6">
               <span>Total Games: {slips.length}</span>
               <span>
-                Total Odds: {slips.reduce((acc, slip) => acc + slip.odds, 0)}
+                Total Odds:{" "}
+                {slips.reduce((acc, slip) => acc + slip.odds, 0).toFixed(2)}
               </span>
             </p>
           </div>
 
           <div className="flex flex-col gap-2">
-            <button
-              onClick={() => {
-                if (hasEnteredPool) router.push("/create-slip?tab=upcoming");
-                else setShowEnterPoolModal(true);
-              }}
-              className="text-lg font-normal bg-[var(--primary)] rounded-lg px-3.5 py-4 text-white capitalize hover:bg-[var(--primary)]/80"
-            >
-              {!hasEnteredPool ? "Enter Pool" : "Edit Slip"}
-            </button>
+            {!hasPoolStarted && (
+              <button
+                onClick={() => {
+                  if (hasEnteredPool) router.push("/create-slip?tab=upcoming");
+                  else setShowEnterPoolModal(true);
+                }}
+                className="text-lg font-normal bg-[var(--primary)] rounded-lg px-3.5 py-4 text-white capitalize hover:bg-[var(--primary)]/80"
+              >
+                {!hasEnteredPool ? "Enter Pool" : "Edit Slip"}
+              </button>
+            )}
             <p className="self-end">Pool: 0.1 SST</p>
           </div>
         </div>
@@ -127,21 +130,25 @@ export default function BettingSlip() {
                 <div className="flex gap-6">
                   <Image src={soccer} alt="image of a soccerball" />
                   <p>
-                    {new Date(game.matchDate)
-                      .toLocaleDateString("en-US", {
-                        month: "long",
-                        day: "numeric",
-                      })
-                      .replace(/(\d+)$/, (num) => {
-                        const lastDigit = +num % 10;
-                        const lastTwoDigits = +num % 100;
-                        if (lastTwoDigits >= 11 && lastTwoDigits <= 13)
+                    {new Date(game.matchDate) < new Date() ? (
+                      <span className="size-2 rounded-full bg-[#32ff40]" />
+                    ) : (
+                      new Date(game.matchDate)
+                        .toLocaleDateString("en-US", {
+                          month: "long",
+                          day: "numeric",
+                        })
+                        .replace(/(\d+)$/, (num) => {
+                          const lastDigit = +num % 10;
+                          const lastTwoDigits = +num % 100;
+                          if (lastTwoDigits >= 11 && lastTwoDigits <= 13)
+                            return num + "th";
+                          if (lastDigit === 1) return num + "st";
+                          if (lastDigit === 2) return num + "nd";
+                          if (lastDigit === 3) return num + "rd";
                           return num + "th";
-                        if (lastDigit === 1) return num + "st";
-                        if (lastDigit === 2) return num + "nd";
-                        if (lastDigit === 3) return num + "rd";
-                        return num + "th";
-                      })}
+                        })
+                    )}
                   </p>
                 </div>
                 <div className="flex gap-16">
@@ -192,12 +199,14 @@ export default function BettingSlip() {
         </div>
 
         <div className="flex items-center justify-center gap-4">
-          <button
-            onClick={() => router.push("/create-slip?tab=upcoming")}
-            className="text-lg font-normal border-[2px] border-[var(--primary)] text-[var(--primary)] bg-white rounded-lg py-3.5 px-4 capitalize hover:bg-white/80"
-          >
-            Add game
-          </button>
+          {!hasPoolStarted && (
+            <button
+              onClick={() => router.push("/create-slip?tab=upcoming")}
+              className="text-lg font-normal border-[2px] border-[var(--primary)] text-[var(--primary)] bg-white rounded-lg py-3.5 px-4 capitalize hover:bg-white/80"
+            >
+              Add game
+            </button>
+          )}
           {!hasEnteredPool && (
             <button className="text-lg font-normal bg-[var(--primary)] rounded-lg px-3.5 py-4 text-white capitalize hover:bg-[var(--primary)]/80">
               Enter Pool

@@ -227,10 +227,6 @@ export default function MatchesTable() {
   const router = useRouter();
   const params = useSearchParams();
 
-  // const [activeTab, setActiveTab] = useState<"live" | "upcoming">(
-  //   (params.get("tab") as "live" | "upcoming") || "live"
-  // );
-
   const [league, setLeague] = useState<number>(0);
   const next = () => {
     if (league === leagues.length - 1) setLeague(0);
@@ -261,6 +257,9 @@ export default function MatchesTable() {
     // staleTime: 10000,
   });
 
+  // const [activeTab, setActiveTab] = useState<"live" | "upcoming">(
+  //   (params.get("tab") as "live" | "upcoming") || "live"
+  // );
   // const [matches, setMatches] = useState(footballMatchesData);
 
   // const handleTabClick = (tab: "live" | "upcoming") => {
@@ -278,15 +277,17 @@ export default function MatchesTable() {
   //   return () => clearInterval(interval);
   // }, []);
 
-  // useEffect(() => {
-  //   toast.info("Select upcoming matches to create slip");
-  // }, []);
-
-  const { addSlip, removeSlip, slips, hasPoolStarted, setPoolId } =
-    useBettingSlips();
+  const {
+    addSlip,
+    removeSlip,
+    slips,
+    hasPoolStarted,
+    setPoolId,
+    hasEnteredPool,
+  } = useBettingSlips();
 
   const addToSlip = (match: BettingSlip) => {
-    if (hasPoolStarted) {
+    if (hasPoolStarted && hasEnteredPool) {
       toast.error("You cannot make changes to the pool");
       return;
     }

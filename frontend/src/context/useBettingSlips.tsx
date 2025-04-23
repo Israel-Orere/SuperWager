@@ -71,7 +71,15 @@ export const BettingSlipsProvider: React.FC<{ children: ReactNode }> = ({
     );
   };
 
-  useEffect(() => {}, []);
+  useEffect(() => {
+    if (slips.length > 0) {
+      const hasStarted = slips.some((slip) => {
+        const matchDate = new Date(slip.matchDate);
+        return matchDate <= new Date();
+      });
+      setHasPoolStarted(hasStarted && hasEnteredPool);
+    }
+  }, [slips, hasEnteredPool]);
 
   return (
     <BettingSlipsContext.Provider
