@@ -6,6 +6,7 @@ import HistoryIcon from "@/assets/svgs/history-icon";
 import PlayIcon from "@/assets/svgs/play-button";
 import TicketIcon from "@/assets/svgs/ticket-icon";
 import WalletIcon from "@/assets/svgs/wallet-icon";
+import { useAuthModal } from "@/context/AuthModalContext";
 import { Eye, LucideEyeOff, Plus } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -14,6 +15,10 @@ import { useState } from "react";
 export default function UserCard() {
   const [showWallet, setShowWallet] = useState(false);
   const [showBalance, setShowBalance] = useState(false);
+
+  const { user } = useAuthModal();
+
+  if (!user) return null;
 
   return (
     <>
@@ -105,7 +110,7 @@ export default function UserCard() {
             className="flex flex-col gap-4 items-center"
           >
             <HistoryIcon />
-            <p>Transaction History</p>
+            <p className="w-full text-center">Transaction History</p>
           </Link>
         </div>
       </div>
