@@ -5,13 +5,18 @@ import CancelXIcon from "@/assets/svgs/cancel-x";
 import GreaterThan from "@/assets/svgs/double-greaterthan";
 import LessThan from "@/assets/svgs/double-lessthan";
 import EditIcon from "@/assets/svgs/edit-icon";
+import GreenCheckIcon from "@/assets/svgs/green-check";
 import PendingIcon from "@/assets/svgs/pending";
+import RedXIcon from "@/assets/svgs/red-x";
 import { useBettingSlips } from "@/context/useBettingSlips";
+import { buildScoresUrl } from "@/utils/utils";
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
 import { Plus } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 export default function BettingSlip() {
@@ -27,6 +32,26 @@ export default function BettingSlip() {
   } = useBettingSlips();
 
   const [showEnterPoolModal, setShowEnterPoolModal] = useState(false);
+
+  const [betslipLeagues, setBetslipLeagues] = useState<LeagueKey[]>([]);
+
+  useEffect(() => {
+    setBetslipLeagues([...new Set(slips.map((slip) => slip.league_key))]);
+  }, []);
+
+  const { data: scoresData = [] } = useQuery<ScoresDataType[]>({
+    queryKey: ["scores", betslipLeagues],
+    queryFn: async () => {
+      const results = await Promise.all(
+        betslipLeagues.map((league) =>
+          axios.get(buildScoresUrl(league)).then((res) => res.data)
+        )
+      );
+      return results.flat();
+    },
+
+    staleTime: 10000,
+  });
 
   if (!slips.length)
     return (
@@ -130,24 +155,31 @@ export default function BettingSlip() {
                 <div className="flex gap-6">
                   <Image src={soccer} alt="image of a soccerball" />
                   <p>
-                    {new Date(game.matchDate) < new Date() ? (
-                      <span className="size-2 rounded-full bg-[#32ff40]" />
+                    {new Date(game.matchDate) <
+                    new Date(Date.now() - 2 * 60 * 60 * 1000) ? (
+                      "completed"
                     ) : (
-                      new Date(game.matchDate)
-                        .toLocaleDateString("en-US", {
-                          month: "long",
-                          day: "numeric",
-                        })
-                        .replace(/(\d+)$/, (num) => {
-                          const lastDigit = +num % 10;
-                          const lastTwoDigits = +num % 100;
-                          if (lastTwoDigits >= 11 && lastTwoDigits <= 13)
-                            return num + "th";
-                          if (lastDigit === 1) return num + "st";
-                          if (lastDigit === 2) return num + "nd";
-                          if (lastDigit === 3) return num + "rd";
-                          return num + "th";
-                        })
+                      <>
+                        {new Date(game.matchDate) < new Date() ? (
+                          <span className="size-2 rounded-full bg-[#32ff40]" />
+                        ) : (
+                          new Date(game.matchDate)
+                            .toLocaleDateString("en-US", {
+                              month: "long",
+                              day: "numeric",
+                            })
+                            .replace(/(\d+)$/, (num) => {
+                              const lastDigit = +num % 10;
+                              const lastTwoDigits = +num % 100;
+                              if (lastTwoDigits >= 11 && lastTwoDigits <= 13)
+                                return num + "th";
+                              if (lastDigit === 1) return num + "st";
+                              if (lastDigit === 2) return num + "nd";
+                              if (lastDigit === 3) return num + "rd";
+                              return num + "th";
+                            })
+                        )}
+                      </>
                     )}
                   </p>
                 </div>
@@ -173,7 +205,36 @@ export default function BettingSlip() {
                   )}
                   {hasPoolStarted && (
                     <>
-                      <PendingIcon />
+                      {(() => {
+                        const currentScores = scoresData.find(
+                          (match) =>
+                            match.away_team === game.awayTeam &&
+                            match.home_team === game.homeTeam
+                        )?.scores;
+
+                        if (!currentScores) return <PendingIcon />;
+
+                        const homeScore = currentScores.find(
+                          (item) => item.name === game.homeTeam
+                        )?.score as string;
+
+                        const awayScore = currentScores.find(
+                          (item) => item.name === game.awayTeam
+                        )?.score as string;
+
+                        const selection = game.selection.toLowerCase();
+                        const isHomeWin = homeScore > awayScore;
+                        const isAwayWin = homeScore < awayScore;
+                        const isDraw = homeScore === awayScore;
+
+                        if (
+                          (selection === "home" && isHomeWin) ||
+                          (selection === "away" && isAwayWin) ||
+                          (selection === "draw" && isDraw)
+                        )
+                          return <GreenCheckIcon />;
+                        else return <RedXIcon />;
+                      })()}
                     </>
                   )}
                 </div>
@@ -182,11 +243,29 @@ export default function BettingSlip() {
                 <div className="flex flex-col gap-8">
                   <div className="flex gap-16 justify-between w-64">
                     <p>{game.homeTeam}</p>
-                    <p>-</p>
+                    <p>
+                      {scoresData
+                        .find(
+                          (match) =>
+                            match.away_team === game.awayTeam &&
+                            match.home_team === game.homeTeam
+                        )
+                        ?.scores?.find((item) => item.name === game.homeTeam)
+                        ?.score || "-"}
+                    </p>
                   </div>
                   <div className="flex gap-16 justify-between w-64">
                     <p>{game.awayTeam}</p>
-                    <p>-</p>
+                    <p>
+                      {scoresData
+                        .find(
+                          (match) =>
+                            match.away_team === game.awayTeam &&
+                            match.home_team === game.homeTeam
+                        )
+                        ?.scores?.find((item) => item.name === game.awayTeam)
+                        ?.score || "-"}
+                    </p>
                   </div>
                 </div>
                 <div className="flex gap-16 mt-auto capitalize">
@@ -196,22 +275,6 @@ export default function BettingSlip() {
               </div>
             </div>
           ))}
-        </div>
-
-        <div className="flex items-center justify-center gap-4">
-          {!hasPoolStarted && (
-            <button
-              onClick={() => router.push("/create-slip?tab=upcoming")}
-              className="text-lg font-normal border-[2px] border-[var(--primary)] text-[var(--primary)] bg-white rounded-lg py-3.5 px-4 capitalize hover:bg-white/80"
-            >
-              Add game
-            </button>
-          )}
-          {!hasEnteredPool && (
-            <button className="text-lg font-normal bg-[var(--primary)] rounded-lg px-3.5 py-4 text-white capitalize hover:bg-[var(--primary)]/80">
-              Enter Pool
-            </button>
-          )}
         </div>
       </div>
     </>

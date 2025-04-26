@@ -15,6 +15,7 @@ export interface BettingSlip {
   selection: "home" | "away" | "draw";
   odds: number;
   outcome: "pending" | "won" | "lost";
+  league_key: LeagueKey;
 }
 
 const BettingSlipsContext = createContext<
@@ -29,6 +30,7 @@ const BettingSlipsContext = createContext<
       setHasEnteredPool: React.Dispatch<React.SetStateAction<boolean>>;
       setPoolId: React.Dispatch<React.SetStateAction<string | null>>;
       setHasPoolStarted: React.Dispatch<React.SetStateAction<boolean>>;
+      poolEndDate: string | null;
     }
   | undefined
 >(undefined);
@@ -81,6 +83,19 @@ export const BettingSlipsProvider: React.FC<{ children: ReactNode }> = ({
     }
   }, [slips, hasEnteredPool]);
 
+  useEffect(() => {
+    if (slips.length > 0 && hasEnteredPool) {
+      const latestMatchDate = slips.reduce((latest, slip) => {
+        const matchDate = new Date(slip.matchDate);
+        return matchDate > latest ? matchDate : latest;
+      }, new Date(slips[0].matchDate));
+
+      setPoolEndDate(
+        new Date(latestMatchDate.getTime() + 2 * 60 * 60 * 1000).toISOString()
+      );
+    } else setPoolEndDate(null);
+  }, [slips, hasEnteredPool]);
+
   return (
     <BettingSlipsContext.Provider
       value={{
@@ -94,6 +109,7 @@ export const BettingSlipsProvider: React.FC<{ children: ReactNode }> = ({
         setHasEnteredPool,
         setPoolId,
         setHasPoolStarted,
+        poolEndDate,
       }}
     >
       {children}

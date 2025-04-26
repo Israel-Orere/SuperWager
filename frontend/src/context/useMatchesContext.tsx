@@ -54,8 +54,6 @@ export const MatchesProvider = ({
     // staleTime: 10000,
   });
 
-  console.log(scores);
-
   return (
     <MatchesContext.Provider
       value={{

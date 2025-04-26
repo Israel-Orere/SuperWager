@@ -76,7 +76,7 @@ export default function UserCard() {
           <div className="size-[100px] flex items-center justify-center bg-white rounded-full overflow-hidden">
             <Image src={pfp} alt="Profile Image" />
           </div>
-          <p className="">User</p>
+          <p className="">{user.username}</p>
           <div className="w-full flex items-center justify-between">
             <p>0.1 SST Pool</p>
             <p>Point: -</p>

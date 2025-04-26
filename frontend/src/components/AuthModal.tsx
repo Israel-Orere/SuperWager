@@ -1,5 +1,6 @@
 "use client";
 
+import { useAuthModal } from "@/context/AuthModalContext";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
 
@@ -10,6 +11,9 @@ interface Props {
 
 const AuthModal: React.FC<Props> = ({ isOpen, onClose }) => {
   const [isSignUp, setIsSignUp] = useState(false);
+
+  const { setUser } = useAuthModal();
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -30,28 +34,42 @@ const AuthModal: React.FC<Props> = ({ isOpen, onClose }) => {
               {isSignUp ? "Sign up" : "Login"}
             </h2>
             {/* Auth form */}
-            <form className="bg-[var(--primary-light)] p-4">
+            <form
+              className="bg-[var(--primary-light)] p-4"
+              onSubmit={(e) => {
+                e.preventDefault();
+                console.log("Form submitted");
+                const formData = new FormData(e.currentTarget);
+                const data = Object.fromEntries(formData.entries());
+                setUser(data as any);
+                onClose();
+              }}
+            >
               {isSignUp && (
                 <input
                   type="text"
                   placeholder="Username"
+                  name="username"
                   className="border p-2 w-full mb-4 outline-blue-700"
                 />
               )}
               <input
                 type="email"
                 placeholder="Email"
+                name="email"
                 className="border p-2 w-full mb-4 outline-blue-700"
               />
               <input
                 type="password"
                 placeholder="Password"
+                name="password"
                 className="border p-2 w-full mb-4 outline-blue-700"
               />
               {isSignUp && (
                 <input
                   type="password"
                   placeholder="Confirm Password"
+                  name="confirm-password"
                   className="border p-2 w-full mb-4 outline-blue-700"
                 />
               )}
@@ -59,7 +77,10 @@ const AuthModal: React.FC<Props> = ({ isOpen, onClose }) => {
                 {isSignUp ? "Sign Up" : "Login"}
               </button>
             </form>
-            <button className="border border-[var(--primary)] p-2 text-[var(--primary)] my-2 mx-auto block">
+            <button
+              type="submit"
+              className="border border-[var(--primary)] p-2 text-[var(--primary)] my-2 mx-auto block"
+            >
               {isSignUp ? "Sign Up" : "Login"} via Google
             </button>
             <p className="text-sm mt-4 text-center">
