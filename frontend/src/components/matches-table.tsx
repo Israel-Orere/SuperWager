@@ -14,8 +14,20 @@ import Loader from "./loader";
 export default function MatchesTable() {
   const router = useRouter();
 
-  const { isError, isLoading, league, matches, prev, next, scores } =
-    useMatches();
+  const {
+    isError,
+    isLoading,
+    league,
+    matches,
+    prev,
+    next,
+    scores,
+    isReady,
+    val,
+  } = useMatches();
+
+  console.log(isReady);
+  console.log(val);
 
   const {
     addSlip,
@@ -125,7 +137,11 @@ export default function MatchesTable() {
               <div className="flex items-center gap-8">
                 <div className="flex flex-col items-center justify-center">
                   <p className="flex flex-col items-center justify-center gap-1 w-20">
-                    {scores[i]?.completed ? (
+                    {scores.find(
+                      (game) =>
+                        game.away_team === match.away_team &&
+                        game.home_team === match.home_team
+                    )?.completed ? (
                       "completed"
                     ) : (
                       <>
@@ -168,14 +184,24 @@ export default function MatchesTable() {
               <div className="flex items-center gap-8">
                 <div className="text-xl flex flex-col gap-2 items-center justify-center">
                   <span>
-                    {scores[i]?.scores?.find(
-                      (item) => item.name === match.home_team
-                    )?.score || "-"}
+                    {scores
+                      .find(
+                        (game) =>
+                          game.away_team === match.away_team &&
+                          game.home_team === match.home_team
+                      )
+                      ?.scores?.find((item) => item.name === match.home_team)
+                      ?.score || "-"}
                   </span>
                   <span>
-                    {scores[i]?.scores?.find(
-                      (item) => item.name === match.away_team
-                    )?.score || "-"}
+                    {scores
+                      .find(
+                        (game) =>
+                          game.away_team === match.away_team &&
+                          game.home_team === match.home_team
+                      )
+                      ?.scores?.find((item) => item.name === match.away_team)
+                      ?.score || "-"}
                   </span>
                 </div>
                 <span>
@@ -385,7 +411,11 @@ export function MiniMatchesTable() {
                 <div className="flex items-center gap-8">
                   <div className="flex flex-col items-center justify-center">
                     <p className="flex flex-col items-center justify-center gap-1 w-20">
-                      {scores[i]?.completed ? (
+                      {scores.find(
+                        (game) =>
+                          game.away_team === match.away_team &&
+                          game.home_team === match.home_team
+                      )?.completed ? (
                         "completed"
                       ) : (
                         <>
@@ -427,14 +457,24 @@ export function MiniMatchesTable() {
                 <div className="flex items-center gap-8">
                   <div className="text-xl flex flex-col gap-2 items-center justify-center">
                     <span>
-                      {scores[i]?.scores?.find(
-                        (item) => item.name === match.home_team
-                      )?.score || "-"}
+                      {scores
+                        .find(
+                          (game) =>
+                            game.away_team === match.away_team &&
+                            game.home_team === match.home_team
+                        )
+                        ?.scores?.find((item) => item.name === match.home_team)
+                        ?.score || "-"}
                     </span>
                     <span>
-                      {scores[i]?.scores?.find(
-                        (item) => item.name === match.away_team
-                      )?.score || "-"}
+                      {scores
+                        .find(
+                          (game) =>
+                            game.away_team === match.away_team &&
+                            game.home_team === match.home_team
+                        )
+                        ?.scores?.find((item) => item.name === match.away_team)
+                        ?.score || "-"}
                     </span>
                   </div>
                   <span>

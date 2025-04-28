@@ -30,6 +30,7 @@ const BettingSlipsContext = createContext<
       setHasEnteredPool: React.Dispatch<React.SetStateAction<boolean>>;
       setPoolId: React.Dispatch<React.SetStateAction<string | null>>;
       setHasPoolStarted: React.Dispatch<React.SetStateAction<boolean>>;
+      hasPoolEnded: boolean;
       poolEndDate: string | null;
     }
   | undefined
@@ -42,6 +43,7 @@ export const BettingSlipsProvider: React.FC<{ children: ReactNode }> = ({
   const [hasEnteredPool, setHasEnteredPool] = useState(false);
   const [poolId, setPoolId] = useState<string | null>(null);
   const [hasPoolStarted, setHasPoolStarted] = useState(false);
+  const [hasPoolEnded, setHasPoolEnded] = useState(false);
   const [poolEndDate, setPoolEndDate] = useState<string | null>(null);
 
   const addSlip = (slip: BettingSlip) => {
@@ -74,13 +76,22 @@ export const BettingSlipsProvider: React.FC<{ children: ReactNode }> = ({
   };
 
   useEffect(() => {
-    if (slips.length > 0) {
-      const hasStarted = slips.some((slip) => {
-        const matchDate = new Date(slip.matchDate);
-        return matchDate <= new Date();
-      });
-      setHasPoolStarted(hasStarted && hasEnteredPool);
-    }
+    if (hasPoolStarted) return;
+
+    const interval = setInterval(() => {
+      if (slips.length === 0) return;
+
+      const hasStarted = slips.some(
+        (slip) => new Date(slip.matchDate) <= new Date()
+      );
+
+      if (hasStarted && hasEnteredPool) {
+        setHasPoolStarted(true);
+        clearInterval(interval);
+      }
+    }, 5000);
+
+    return () => clearInterval(interval);
   }, [slips, hasEnteredPool]);
 
   useEffect(() => {
@@ -97,6 +108,26 @@ export const BettingSlipsProvider: React.FC<{ children: ReactNode }> = ({
     } else setPoolEndDate(null);
   }, [slips, hasEnteredPool]);
 
+  useEffect(() => {
+    if (!poolEndDate) return;
+
+    const checkPoolEnded = () => {
+      const now = new Date();
+      const endDate = new Date(poolEndDate);
+
+      if (now >= endDate) {
+        setHasPoolEnded(true);
+        clearInterval(intervalId);
+      }
+    };
+
+    checkPoolEnded();
+
+    const intervalId = setInterval(checkPoolEnded, 5000);
+
+    return () => clearInterval(intervalId);
+  }, [poolEndDate]);
+
   return (
     <BettingSlipsContext.Provider
       value={{
@@ -110,6 +141,7 @@ export const BettingSlipsProvider: React.FC<{ children: ReactNode }> = ({
         setHasEnteredPool,
         setPoolId,
         setHasPoolStarted,
+        hasPoolEnded,
         poolEndDate,
       }}
     >

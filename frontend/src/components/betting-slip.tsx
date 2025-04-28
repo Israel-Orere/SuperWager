@@ -30,6 +30,7 @@ export default function BettingSlip() {
     hasPoolStarted,
     setHasEnteredPool,
     removeSlip,
+    hasPoolEnded,
     poolEndDate,
   } = useBettingSlips();
 
@@ -57,25 +58,10 @@ export default function BettingSlip() {
   const [showConfetti, setShowConfetti] = useState(false);
 
   useEffect(() => {
-    if (!poolEndDate) return;
+    if (!poolEndDate || !hasPoolEnded) return;
 
-    let hasShown = false;
-    const checkPoolEnd = () => {
-      console.log(poolEndDate);
-      const hasEnded = new Date(poolEndDate).getTime() < Date.now();
-      if (hasEnded && !hasShown && hasPoolStarted) {
-        setShowConfetti(true);
-        toast.success("Pool has ended");
-        hasShown = true;
-        setTimeout(() => setShowConfetti(false), 5000);
-      }
-    };
-
-    const interval = setInterval(checkPoolEnd, 1000);
-    checkPoolEnd();
-
-    return () => clearInterval(interval);
-  }, [poolEndDate]);
+    setShowConfetti(!!poolEndDate && hasPoolEnded);
+  }, [poolEndDate, hasPoolEnded]);
 
   if (!slips.length)
     return (

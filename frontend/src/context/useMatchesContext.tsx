@@ -1,10 +1,14 @@
 "use client";
 
 import { leagues } from "@/utils/constant";
-import { buildOddsUrl, buildScoresUrl } from "@/utils/utils";
+import {
+  buildOddsUrl,
+  buildOddsWebSocketUrl,
+  buildScoresUrl,
+} from "@/utils/utils";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useRef, useEffect, useState } from "react";
 
 type MatchesContextType = {
   matches: MatchesType[];
@@ -14,6 +18,8 @@ type MatchesContextType = {
   prev: () => void;
   isLoading: boolean;
   isError: boolean;
+  isReady: boolean;
+  val: any;
 };
 
 const MatchesContext = createContext<MatchesContextType | undefined>(undefined);
@@ -54,6 +60,28 @@ export const MatchesProvider = ({
     // staleTime: 10000,
   });
 
+  const [isReady, setIsReady] = useState(false);
+  const [val, setVal] = useState(null);
+
+  const ws = useRef<WebSocket | null>(null);
+
+  // useEffect(() => {
+  //   const socket = new WebSocket(buildOddsWebSocketUrl("soccer_italy_serie_a"));
+
+  //   socket.onopen = () => setIsReady(true);
+  //   socket.onclose = () => setIsReady(false);
+  //   socket.onmessage = (event) => {
+  //     setVal(event.data);
+  //     console.log(event);
+  //   };
+
+  //   ws.current = socket;
+
+  //   return () => {
+  //     socket.close();
+  //   };
+  // }, []);
+
   return (
     <MatchesContext.Provider
       value={{
@@ -64,6 +92,8 @@ export const MatchesProvider = ({
         prev,
         isLoading,
         isError,
+        isReady,
+        val,
       }}
     >
       {children}

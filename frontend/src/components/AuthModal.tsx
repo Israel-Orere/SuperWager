@@ -42,6 +42,7 @@ const AuthModal: React.FC<Props> = ({ isOpen, onClose }) => {
                 const formData = new FormData(e.currentTarget);
                 const data = Object.fromEntries(formData.entries());
                 setUser(data as any);
+                localStorage.setItem("user", JSON.stringify(data));
                 onClose();
               }}
             >
