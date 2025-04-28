@@ -26,9 +26,6 @@ export default function MatchesTable() {
     val,
   } = useMatches();
 
-  console.log(isReady);
-  console.log(val);
-
   const {
     addSlip,
     removeSlip,

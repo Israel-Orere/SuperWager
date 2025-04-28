@@ -63,7 +63,7 @@ export const MatchesProvider = ({
   const [isReady, setIsReady] = useState(false);
   const [val, setVal] = useState(null);
 
-  const ws = useRef<WebSocket | null>(null);
+  // const ws = useRef<WebSocket | null>(null);
 
   // useEffect(() => {
   //   const socket = new WebSocket(buildOddsWebSocketUrl("soccer_italy_serie_a"));
@@ -72,7 +72,6 @@ export const MatchesProvider = ({
   //   socket.onclose = () => setIsReady(false);
   //   socket.onmessage = (event) => {
   //     setVal(event.data);
-  //     console.log(event);
   //   };
 
   //   ws.current = socket;
