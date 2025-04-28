@@ -125,7 +125,7 @@ export default function MatchesTable() {
               <div className="flex items-center gap-8">
                 <div className="flex flex-col items-center justify-center">
                   <p className="flex flex-col items-center justify-center gap-1 w-20">
-                    {scores[i].completed ? (
+                    {scores[i]?.completed ? (
                       "completed"
                     ) : (
                       <>
@@ -385,7 +385,7 @@ export function MiniMatchesTable() {
                 <div className="flex items-center gap-8">
                   <div className="flex flex-col items-center justify-center">
                     <p className="flex flex-col items-center justify-center gap-1 w-20">
-                      {scores[i].completed ? (
+                      {scores[i]?.completed ? (
                         "completed"
                       ) : (
                         <>

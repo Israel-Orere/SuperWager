@@ -85,14 +85,15 @@ export const BettingSlipsProvider: React.FC<{ children: ReactNode }> = ({
 
   useEffect(() => {
     if (slips.length > 0 && hasEnteredPool) {
-      const latestMatchDate = slips.reduce((latest, slip) => {
-        const matchDate = new Date(slip.matchDate);
-        return matchDate > latest ? matchDate : latest;
-      }, new Date(slips[0].matchDate));
-
-      setPoolEndDate(
-        new Date(latestMatchDate.getTime() + 2 * 60 * 60 * 1000).toISOString()
+      const latestMatchDate = slips.reduce(
+        (latest, slip) =>
+          new Date(slip.matchDate) > latest ? new Date(slip.matchDate) : latest,
+        new Date(0)
       );
+
+      const endDate = new Date(latestMatchDate);
+      endDate.setHours(endDate.getHours() + 2);
+      setPoolEndDate(endDate.toISOString());
     } else setPoolEndDate(null);
   }, [slips, hasEnteredPool]);
 

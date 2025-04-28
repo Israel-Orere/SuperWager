@@ -13,3 +13,11 @@ export const sports_data_leagues = [
   { competition_id: 2, key: "DEB", name: "Bundesliga" },
   { competition_id: 13, key: "FRL1", name: "Ligue 1" },
 ];
+
+export const soccer_league = [
+  { id: "3", name: "England" },
+  { id: "4", name: "Germany", league_id: "594" },
+  { id: "5", name: "Spain" },
+  { id: "6", name: "Italy" },
+  { id: "7", name: "France" },
+];

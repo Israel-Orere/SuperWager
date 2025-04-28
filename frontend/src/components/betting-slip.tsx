@@ -18,6 +18,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import Confetti from "react-confetti";
 
 export default function BettingSlip() {
   const router = useRouter();
@@ -29,6 +30,7 @@ export default function BettingSlip() {
     hasPoolStarted,
     setHasEnteredPool,
     removeSlip,
+    poolEndDate,
   } = useBettingSlips();
 
   const [showEnterPoolModal, setShowEnterPoolModal] = useState(false);
@@ -44,14 +46,36 @@ export default function BettingSlip() {
     queryFn: async () => {
       const results = await Promise.all(
         betslipLeagues.map((league) =>
-          axios.get(buildScoresUrl(league)).then((res) => res.data)
+          axios.get(buildScoresUrl(league, 3)).then((res) => res.data)
         )
       );
       return results.flat();
     },
-
-    staleTime: 10000,
+    // staleTime: 10000,
   });
+
+  const [showConfetti, setShowConfetti] = useState(false);
+
+  useEffect(() => {
+    if (!poolEndDate) return;
+
+    let hasShown = false;
+    const checkPoolEnd = () => {
+      console.log(poolEndDate);
+      const hasEnded = new Date(poolEndDate).getTime() < Date.now();
+      if (hasEnded && !hasShown && hasPoolStarted) {
+        setShowConfetti(true);
+        toast.success("Pool has ended");
+        hasShown = true;
+        setTimeout(() => setShowConfetti(false), 5000);
+      }
+    };
+
+    const interval = setInterval(checkPoolEnd, 1000);
+    checkPoolEnd();
+
+    return () => clearInterval(interval);
+  }, [poolEndDate]);
 
   if (!slips.length)
     return (
@@ -111,6 +135,25 @@ export default function BettingSlip() {
           </div>
         </div>
       )}
+      {showConfetti && (
+        <Confetti
+          width={window.innerWidth}
+          height={window.innerHeight}
+          recycle={false}
+          numberOfPieces={200}
+          gravity={0.2}
+          initialVelocityY={10}
+          colors={[
+            "#FF0000",
+            "#00FF00",
+            "#0000FF",
+            "#FFFF00",
+            "#FF00FF",
+            "#00FFFF",
+          ]}
+          wind={0.01}
+        />
+      )}
       <div className="bg-[var(--primary-light)] rounded-2xl py-6 px-8 flex flex-col gap-16">
         <div className="w-full flex justify-between">
           <div className="flex justify-between flex-col">
@@ -154,7 +197,7 @@ export default function BettingSlip() {
               <div className="flex items-center justify-between gap-4">
                 <div className="flex gap-6">
                   <Image src={soccer} alt="image of a soccerball" />
-                  <p>
+                  <p className="flex flex-col items-center justify-center gap-1 w-20">
                     {new Date(game.matchDate) <
                     new Date(Date.now() - 2 * 60 * 60 * 1000) ? (
                       "completed"
@@ -163,21 +206,37 @@ export default function BettingSlip() {
                         {new Date(game.matchDate) < new Date() ? (
                           <span className="size-2 rounded-full bg-[#32ff40]" />
                         ) : (
-                          new Date(game.matchDate)
-                            .toLocaleDateString("en-US", {
-                              month: "long",
-                              day: "numeric",
-                            })
-                            .replace(/(\d+)$/, (num) => {
-                              const lastDigit = +num % 10;
-                              const lastTwoDigits = +num % 100;
-                              if (lastTwoDigits >= 11 && lastTwoDigits <= 13)
-                                return num + "th";
-                              if (lastDigit === 1) return num + "st";
-                              if (lastDigit === 2) return num + "nd";
-                              if (lastDigit === 3) return num + "rd";
-                              return num + "th";
-                            })
+                          <>
+                            <span>
+                              {new Date(game.matchDate)
+                                .toLocaleDateString("en-US", {
+                                  month: "long",
+                                  day: "numeric",
+                                })
+                                .replace(/(\d+)$/, (num) => {
+                                  const lastDigit = +num % 10;
+                                  const lastTwoDigits = +num % 100;
+                                  if (
+                                    lastTwoDigits >= 11 &&
+                                    lastTwoDigits <= 13
+                                  )
+                                    return num + "th";
+                                  if (lastDigit === 1) return num + "st";
+                                  if (lastDigit === 2) return num + "nd";
+                                  if (lastDigit === 3) return num + "rd";
+                                  return num + "th";
+                                })}
+                            </span>
+                            <span>
+                              {`${new Date(game.matchDate)
+                                .getHours()
+                                .toString()
+                                .padStart(2, "0")}:${new Date(game.matchDate)
+                                .getMinutes()
+                                .toString()
+                                .padStart(2, "0")}`}
+                            </span>
+                          </>
                         )}
                       </>
                     )}

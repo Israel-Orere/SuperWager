@@ -25,5 +25,5 @@ export const buildOddsUrl = (league_key: LeagueKey) => {
   return `${baseUrl}?${queryString}`;
 };
 
-export const buildScoresUrl = (league_key: LeagueKey) =>
+export const buildScoresUrl = (league_key: LeagueKey, days: number = 1) =>
   `https://api.the-odds-api.com/v4/sports/${league_key}/scores?apiKey=${process.env.NEXT_PUBLIC_ODDS_API_KEY}&dateFormat=iso`;
