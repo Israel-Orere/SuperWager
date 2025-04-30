@@ -5,6 +5,7 @@ import GreaterThanIcon from "@/assets/svgs/greater-than";
 import { BettingSlip, useBettingSlips } from "@/context/useBettingSlips";
 import { useMatches } from "@/context/useMatchesContext";
 import { leagues } from "@/utils/constant";
+import { daysArray } from "@/utils/utils";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -22,6 +23,8 @@ export default function MatchesTable() {
     prev,
     next,
     scores,
+    startingDate,
+    setStartingDate,
     isReady,
     val,
   } = useMatches();
@@ -77,8 +80,23 @@ export default function MatchesTable() {
 
   return (
     <div className="w-full flex flex-col gap-4">
-      <div className="w-full flex items-center justify-between">
+      <div className="w-full flex items-center justify-between gap-8">
         <h2 className="text-4xl">Football</h2>
+        <div className="flex items-center justify-center gap-8">
+          <span
+            className="cursor-pointer p-1 rounded-full hover:bg-[var(--primary-light)]"
+            onClick={prev}
+          >
+            <ArrowLeft className="size-6 stroke-[var(--primary)]" />
+          </span>
+          <p className="text-xl font-semibold">{leagues[league].title}</p>
+          <span
+            className="cursor-pointer p-1 rounded-full hover:bg-[var(--primary-light)]"
+            onClick={next}
+          >
+            <ArrowRight className="size-6 stroke-[var(--primary)]" />
+          </span>
+        </div>
 
         {!hasEnteredPool && (
           <button
@@ -89,20 +107,26 @@ export default function MatchesTable() {
           </button>
         )}
       </div>
-      <div className="flex items-center justify-center gap-8">
-        <span
-          className="cursor-pointer p-1 rounded-full hover:bg-[var(--primary-light)]"
-          onClick={prev}
-        >
-          <ArrowLeft className="size-6 stroke-[var(--primary)]" />
-        </span>
-        <p className="text-xl font-semibold">{leagues[league].title}</p>
-        <span
-          className="cursor-pointer p-1 rounded-full hover:bg-[var(--primary-light)]"
-          onClick={next}
-        >
-          <ArrowRight className="size-6 stroke-[var(--primary)]" />
-        </span>
+
+      <div className="flex w-full overflow-x-auto">
+        {daysArray.map((item, i) => (
+          <div
+            key={i}
+            className="flex-1 flex items-center justify-center relative p-4 cursor-pointer hover:bg-[var(--primary-light)]"
+            onClick={() => setStartingDate(item.date)}
+          >
+            <p
+              className={`text-xl ${
+                startingDate === item.date ? "text-black" : "text-black/50"
+              }`}
+            >
+              {item.label}
+            </p>
+            {startingDate === item.date && (
+              <span className="absolute inset-x-0 bottom-0 h-0.5 bg-[var(--primary)] transition-transform duration-300 transform translate-y-0" />
+            )}
+          </div>
+        ))}
       </div>
 
       {isLoading && (
@@ -116,6 +140,12 @@ export default function MatchesTable() {
           <p className="text-xl font-medium text-red-600">
             Error fetching the table data
           </p>
+        </div>
+      )}
+
+      {!isLoading && !isError && matches.length === 0 && (
+        <div className="w-full p-8 flex items-center justify-center">
+          <p className="text-xl font-medium">No matches to display</p>
         </div>
       )}
 
@@ -353,30 +383,41 @@ export default function MatchesTable() {
 }
 
 export function MiniMatchesTable() {
-  const { isError, isLoading, league, matches, prev, next, scores } =
-    useMatches();
+  const {
+    isError,
+    isLoading,
+    league,
+    matches,
+    prev,
+    next,
+    scores,
+    startingDate,
+    setStartingDate,
+  } = useMatches();
 
   return (
     <Link href={"/create-slip"}>
       <div className="w-full flex flex-col gap-4">
-        <div className="w-full flex items-center justify-between">
+        <div className="w-full flex items-center justify-between gap-8">
           <h2 className="text-4xl">Football</h2>
+          <div className="flex items-center justify-center gap-8">
+            <span
+              className="cursor-pointer p-1 rounded-full hover:bg-[var(--primary-light)]"
+              onClick={prev}
+            >
+              <ArrowLeft className="size-6 stroke-[var(--primary)]" />
+            </span>
+            <p className="text-xl font-semibold">{leagues[league].title}</p>
+            <span
+              className="cursor-pointer p-1 rounded-full hover:bg-[var(--primary-light)]"
+              onClick={next}
+            >
+              <ArrowRight className="size-6 stroke-[var(--primary)]" />
+            </span>
+          </div>
         </div>
-        <div className="flex items-center justify-center gap-8">
-          <span
-            className="cursor-pointer p-1 rounded-full hover:bg-[var(--primary-light)]"
-            onClick={prev}
-          >
-            <ArrowLeft className="size-6 stroke-[var(--primary)]" />
-          </span>
-          <p className="text-xl font-semibold">{leagues[league].title}</p>
-          <span
-            className="cursor-pointer p-1 rounded-full hover:bg-[var(--primary-light)]"
-            onClick={next}
-          >
-            <ArrowRight className="size-6 stroke-[var(--primary)]" />
-          </span>
-        </div>
+
+        <div></div>
 
         {isLoading && (
           <div className="w-full p-8 flex items-center justify-center">
@@ -391,6 +432,33 @@ export function MiniMatchesTable() {
             </p>
           </div>
         )}
+
+        {!isLoading && !isError && matches.length === 0 && (
+          <div className="w-full p-8 flex items-center justify-center">
+            <p className="text-xl font-medium">No matches to display</p>
+          </div>
+        )}
+
+        <div className="flex w-full overflow-x-auto">
+          {daysArray.map((item, i) => (
+            <div
+              key={i}
+              className="flex-1 flex items-center justify-center relative p-4 cursor-pointer hover:bg-[var(--primary-light)]"
+              onClick={() => setStartingDate(item.date)}
+            >
+              <p
+                className={`text-xl ${
+                  startingDate === item.date ? "text-black" : "text-black/50"
+                }`}
+              >
+                {item.label}
+              </p>
+              {startingDate === item.date && (
+                <span className="absolute inset-x-0 bottom-0 h-0.5 bg-[var(--primary)] transition-transform duration-300 transform translate-y-0" />
+              )}
+            </div>
+          ))}
+        </div>
 
         <div>
           {matches
