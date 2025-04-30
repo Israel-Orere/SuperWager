@@ -60,6 +60,7 @@ export const MatchesProvider = ({
     data: matches = [],
     isLoading,
     isError,
+    error,
   } = useQuery<MatchesType[]>({
     queryKey: ["matches", leagues[league].key, startingDate],
     queryFn: async () =>
@@ -76,6 +77,8 @@ export const MatchesProvider = ({
 
     // staleTime: 10000,
   });
+
+  console.log(error);
 
   const [isReady, setIsReady] = useState(false);
   const [val, setVal] = useState(null);

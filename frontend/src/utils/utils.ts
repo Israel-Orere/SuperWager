@@ -7,8 +7,7 @@ export const buildOddsUrl = (league_key: LeagueKey, date: string) => {
     markets: "h2h,spreads",
     dateFormat: "iso",
     oddsFormat: "decimal",
-    commenceTimeFrom: date,
-    // || new Date().toISOString().split("T")[0] + "T00:00:00Z",
+    commenceTimeFrom: new Date(date).toISOString().split("T")[0] + "T00:00:00Z",
     commenceTimeTo:
       new Date(new Date(date).setDate(new Date(date).getDate() + 1))
         .toISOString()

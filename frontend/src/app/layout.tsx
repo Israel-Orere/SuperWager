@@ -3,11 +3,11 @@ import AuthModalWrapper from "@/components/AuthModalWrapper";
 import Navbar from "@/components/navbar";
 import { AuthModalProvider } from "@/context/AuthModalContext";
 import { BettingSlipsProvider } from "@/context/useBettingSlips";
+import { MatchesProvider } from "@/context/useMatchesContext";
 import QueryProvider from "@/providers/QueryProvider";
 import type { Metadata } from "next";
 import { Toaster } from "sonner";
 import "./globals.css";
-import { MatchesProvider } from "@/context/useMatchesContext";
 
 export const metadata: Metadata = {
   title: "SuperWager",

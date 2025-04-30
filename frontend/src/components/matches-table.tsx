@@ -11,6 +11,10 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import Loader from "./loader";
+import CalendarIcon from "@/assets/svgs/calendar";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import "react-calendar/dist/Calendar.css";
 
 export default function MatchesTable() {
   const router = useRouter();
@@ -108,25 +112,41 @@ export default function MatchesTable() {
         )}
       </div>
 
-      <div className="flex w-full overflow-x-auto">
-        {daysArray.map((item, i) => (
-          <div
-            key={i}
-            className="flex-1 flex items-center justify-center relative p-4 cursor-pointer hover:bg-[var(--primary-light)]"
-            onClick={() => setStartingDate(item.date)}
-          >
-            <p
-              className={`text-xl ${
-                startingDate === item.date ? "text-black" : "text-black/50"
-              }`}
+      <div className="flex w-full items-center overflow-x-auto">
+        <>
+          {daysArray.map((item, i) => (
+            <div
+              key={i}
+              className="flex-1 flex items-center justify-center relative p-4 cursor-pointer hover:bg-[var(--primary-light)]"
+              onClick={() => setStartingDate(item.date)}
             >
-              {item.label}
-            </p>
-            {startingDate === item.date && (
-              <span className="absolute inset-x-0 bottom-0 h-0.5 bg-[var(--primary)] transition-transform duration-300 transform translate-y-0" />
-            )}
+              <p
+                className={`text-xl ${
+                  startingDate === item.date ? "text-black" : "text-black/50"
+                }`}
+              >
+                {item.label}
+              </p>
+              {startingDate === item.date && (
+                <span className="absolute inset-x-0 bottom-0 h-0.5 bg-[var(--primary)] transition-transform duration-300 transform translate-y-0" />
+              )}
+            </div>
+          ))}
+
+          <div>
+            <DatePicker
+              excludeDates={daysArray.map((item) => new Date(item.date))}
+              minDate={new Date()}
+              selected={new Date(startingDate)}
+              onChange={(date) => setStartingDate(date?.toISOString() || "")}
+              customInput={
+                <div className="cursor-pointer px-2">
+                  <CalendarIcon />
+                </div>
+              }
+            />
           </div>
-        ))}
+        </>
       </div>
 
       {isLoading && (
@@ -438,6 +458,27 @@ export function MiniMatchesTable() {
             <p className="text-xl font-medium">No matches to display</p>
           </div>
         )}
+
+        <div className="flex w-full overflow-x-auto">
+          {daysArray.map((item, i) => (
+            <div
+              key={i}
+              className="flex-1 flex items-center justify-center relative p-4 cursor-pointer hover:bg-[var(--primary-light)]"
+              onClick={() => setStartingDate(item.date)}
+            >
+              <p
+                className={`text-xl ${
+                  startingDate === item.date ? "text-black" : "text-black/50"
+                }`}
+              >
+                {item.label}
+              </p>
+              {startingDate === item.date && (
+                <span className="absolute inset-x-0 bottom-0 h-0.5 bg-[var(--primary)] transition-transform duration-300 transform translate-y-0" />
+              )}
+            </div>
+          ))}
+        </div>
 
         <div className="flex w-full overflow-x-auto">
           {daysArray.map((item, i) => (
