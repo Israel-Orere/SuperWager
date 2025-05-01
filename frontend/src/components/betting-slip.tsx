@@ -61,8 +61,8 @@ export default function BettingSlip() {
   useEffect(() => {
     if (!poolEndDate || !hasPoolEnded) return;
 
-    setShowConfetti(!!poolEndDate && hasPoolEnded);
-  }, [poolEndDate, hasPoolEnded]);
+    setShowConfetti(!!poolEndDate && hasPoolEnded && hasWon === "won");
+  }, [poolEndDate, hasPoolEnded, hasWon]);
 
   if (!slips.length)
     return (

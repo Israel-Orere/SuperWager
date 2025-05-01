@@ -31,7 +31,7 @@ const BettingSlipsContext = createContext<
       poolId: string | null;
       hasPoolEnded: boolean;
       poolEndDate: string | null;
-      hasWon: boolean;
+      hasWon: "pending" | "lost" | "won";
     }
   | undefined
 >(undefined);
@@ -43,7 +43,7 @@ const initialState = {
   hasPoolStarted: false,
   hasPoolEnded: false,
   poolEndDate: null,
-  hasWon: false,
+  hasWon: "pending" as "pending" | "lost" | "won",
 };
 
 type GameState = {
@@ -53,7 +53,7 @@ type GameState = {
   hasPoolStarted: boolean;
   hasPoolEnded: boolean;
   poolEndDate: string | null;
-  hasWon: boolean;
+  hasWon: "pending" | "lost" | "won";
 };
 
 export const BettingSlipsProvider: React.FC<{ children: ReactNode }> = ({
@@ -150,6 +150,10 @@ export const BettingSlipsProvider: React.FC<{ children: ReactNode }> = ({
     const storedGameState = localStorage.getItem("game");
     if (storedGameState) setGameState(JSON.parse(storedGameState));
   }, []);
+
+  useEffect(() => {
+    localStorage.setItem("game", JSON.stringify(gameState));
+  }, [gameState]);
 
   return (
     <BettingSlipsContext.Provider
