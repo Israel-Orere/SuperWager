@@ -52,14 +52,7 @@ export default function UserCard() {
                   <Plus className="stroke-[var(--primary)] stroke-2" />
                 </span>
               </p>
-              <button
-                // onClick={() => {
-                //   setHasEnteredPool(true);
-                //   toast.success("You have entered the pool");
-                //   setShowEnterPoolModal(false);
-                // }}
-                className="text-lg font-normal bg-[var(--primary)] rounded-lg px-3.5 py-2.5 text-white capitalize hover:bg-[var(--primary)]/80"
-              >
+              <button className="text-lg font-normal bg-[var(--primary)] rounded-lg px-3.5 py-2.5 text-white capitalize hover:bg-[var(--primary)]/80">
                 Withdraw
               </button>
             </div>

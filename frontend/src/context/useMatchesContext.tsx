@@ -78,8 +78,6 @@ export const MatchesProvider = ({
     // staleTime: 10000,
   });
 
-  console.log(error);
-
   const [isReady, setIsReady] = useState(false);
   const [val, setVal] = useState(null);
 

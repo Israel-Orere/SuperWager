@@ -480,27 +480,6 @@ export function MiniMatchesTable() {
           ))}
         </div>
 
-        <div className="flex w-full overflow-x-auto">
-          {daysArray.map((item, i) => (
-            <div
-              key={i}
-              className="flex-1 flex items-center justify-center relative p-4 cursor-pointer hover:bg-[var(--primary-light)]"
-              onClick={() => setStartingDate(item.date)}
-            >
-              <p
-                className={`text-xl ${
-                  startingDate === item.date ? "text-black" : "text-black/50"
-                }`}
-              >
-                {item.label}
-              </p>
-              {startingDate === item.date && (
-                <span className="absolute inset-x-0 bottom-0 h-0.5 bg-[var(--primary)] transition-transform duration-300 transform translate-y-0" />
-              )}
-            </div>
-          ))}
-        </div>
-
         <div>
           {matches
             .filter(

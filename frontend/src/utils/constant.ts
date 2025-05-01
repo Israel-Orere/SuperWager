@@ -6,18 +6,17 @@ export const leagues: League[] = [
   { title: "Ligue 1", key: "soccer_france_ligue_one" },
 ];
 
-export const sports_data_leagues = [
-  { competition_id: 1, key: "EPL", name: "Premier League" },
-  { competition_id: 4, key: "ESP", name: "Primera Division" },
-  { competition_id: 6, key: "ITSA", name: "Serie A" },
-  { competition_id: 2, key: "DEB", name: "Bundesliga" },
-  { competition_id: 13, key: "FRL1", name: "Ligue 1" },
-];
-
-export const soccer_league = [
-  { id: "3", name: "England" },
-  { id: "4", name: "Germany", league_id: "594" },
-  { id: "5", name: "Spain" },
-  { id: "6", name: "Italy" },
-  { id: "7", name: "France" },
+export const radar_leagues = [
+  {
+    id: "sr:competition:17",
+    name: "Premier League",
+  },
+  { id: "sr:competition:8", name: "LaLiga" },
+  { id: "sr:competition:34", name: "Ligue 1" },
+  { id: "sr:competition:23", name: "Serie A" },
+  {
+    id: "sr:competition:34",
+    name: "Ligue 1",
+  },
+  { id: "sr:competition:35", name: "Bundesliga" },
 ];

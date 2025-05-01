@@ -20,129 +20,146 @@ export interface BettingSlip {
 
 const BettingSlipsContext = createContext<
   | {
-      slips: BettingSlip[];
       addSlip: (slip: BettingSlip) => void;
       removeSlip: (slip: BettingSlip) => void;
       updateSlip: (index: number, updatedSlip: BettingSlip) => void;
+      setHasEnteredPool: (val: boolean) => void;
+      setPoolId: (val: string) => void;
+      slips: BettingSlip[];
       hasEnteredPool: boolean;
       hasPoolStarted: boolean;
       poolId: string | null;
-      setHasEnteredPool: React.Dispatch<React.SetStateAction<boolean>>;
-      setPoolId: React.Dispatch<React.SetStateAction<string | null>>;
-      setHasPoolStarted: React.Dispatch<React.SetStateAction<boolean>>;
       hasPoolEnded: boolean;
       poolEndDate: string | null;
+      hasWon: boolean;
     }
   | undefined
 >(undefined);
 
+const initialState = {
+  slips: [],
+  hasEnteredPool: false,
+  poolId: null,
+  hasPoolStarted: false,
+  hasPoolEnded: false,
+  poolEndDate: null,
+  hasWon: false,
+};
+
+type GameState = {
+  slips: BettingSlip[];
+  hasEnteredPool: boolean;
+  poolId: string | null;
+  hasPoolStarted: boolean;
+  hasPoolEnded: boolean;
+  poolEndDate: string | null;
+  hasWon: boolean;
+};
+
 export const BettingSlipsProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
-  const [slips, setSlips] = useState<BettingSlip[]>([]);
-  const [hasEnteredPool, setHasEnteredPool] = useState(false);
-  const [poolId, setPoolId] = useState<string | null>(null);
-  const [hasPoolStarted, setHasPoolStarted] = useState(false);
-  const [hasPoolEnded, setHasPoolEnded] = useState(false);
-  const [poolEndDate, setPoolEndDate] = useState<string | null>(null);
+  const [gameState, setGameState] = useState<GameState>(initialState);
 
   const addSlip = (slip: BettingSlip) => {
-    setSlips((prevSlips) => [
-      ...prevSlips,
-      { ...slip, matchDate: new Date(slip.matchDate).toISOString() },
-    ]);
+    setGameState((prev) => ({
+      ...prev,
+      slips: [
+        ...prev.slips,
+        { ...slip, matchDate: new Date(slip.matchDate).toISOString() },
+      ],
+    }));
   };
 
   const removeSlip = (slip: Partial<BettingSlip>) => {
-    const updatedSlips = slips.filter(
+    const updatedSlips = gameState.slips.filter(
       (s) =>
         s.homeTeam !== slip.homeTeam &&
         s.awayTeam !== slip.awayTeam &&
         s.odds !== slip.odds
     );
-
-    setSlips(updatedSlips);
-
-    if (updatedSlips.length === 0) {
-      setPoolId(null);
-      setHasEnteredPool(false);
-    }
+    setGameState((prev) => ({
+      ...prev,
+      slips: updatedSlips,
+      poolId: updatedSlips.length === 0 ? null : prev.poolId,
+      hasEnteredPool: updatedSlips.length === 0 ? false : prev.hasEnteredPool,
+    }));
   };
 
   const updateSlip = (index: number, updatedSlip: BettingSlip) => {
-    setSlips((prevSlips) =>
-      prevSlips.map((slip, i) => (i === index ? updatedSlip : slip))
-    );
+    setGameState((prev) => ({
+      ...prev,
+      slips: prev.slips.map((slip, i) => (i === index ? updatedSlip : slip)),
+    }));
+  };
+
+  const setPoolId = (id: string) => {
+    setGameState((prev) => ({ ...prev, poolId: id }));
+  };
+
+  const setHasEnteredPool = (val: boolean) => {
+    setGameState((prev) => ({ ...prev, hasEnteredPool: val }));
   };
 
   useEffect(() => {
-    if (hasPoolStarted) return;
+    if (gameState.hasPoolStarted) return;
 
     const interval = setInterval(() => {
-      if (slips.length === 0) return;
-
-      const hasStarted = slips.some(
+      if (gameState.slips.length === 0) return;
+      const hasStarted = gameState.slips.some(
         (slip) => new Date(slip.matchDate) <= new Date()
       );
-
-      if (hasStarted && hasEnteredPool) {
-        setHasPoolStarted(true);
+      if (hasStarted && gameState.hasEnteredPool) {
+        setGameState((prev) => ({ ...prev, hasPoolStarted: true }));
         clearInterval(interval);
       }
     }, 5000);
 
     return () => clearInterval(interval);
-  }, [slips, hasEnteredPool]);
+  }, [gameState.slips, gameState.hasEnteredPool, gameState.hasPoolStarted]);
 
   useEffect(() => {
-    if (slips.length > 0 && hasEnteredPool) {
-      const latestMatchDate = slips.reduce(
+    if (gameState.slips.length > 0 && gameState.hasEnteredPool) {
+      const latestMatchDate = gameState.slips.reduce(
         (latest, slip) =>
           new Date(slip.matchDate) > latest ? new Date(slip.matchDate) : latest,
         new Date(0)
       );
-
       const endDate = new Date(latestMatchDate);
       endDate.setHours(endDate.getHours() + 2);
-      setPoolEndDate(endDate.toISOString());
-    } else setPoolEndDate(null);
-  }, [slips, hasEnteredPool]);
+      setGameState((prev) => ({ ...prev, poolEndDate: endDate.toISOString() }));
+    } else setGameState((prev) => ({ ...prev, poolEndDate: null }));
+  }, [gameState.slips, gameState.hasEnteredPool]);
 
   useEffect(() => {
-    if (!poolEndDate) return;
-
+    if (!gameState.poolEndDate) return;
     const checkPoolEnded = () => {
       const now = new Date();
-      const endDate = new Date(poolEndDate);
-
+      const endDate = new Date(gameState.poolEndDate!);
       if (now >= endDate) {
-        setHasPoolEnded(true);
+        setGameState((prev) => ({ ...prev, hasPoolEnded: true }));
         clearInterval(intervalId);
       }
     };
-
     checkPoolEnded();
-
     const intervalId = setInterval(checkPoolEnded, 5000);
-
     return () => clearInterval(intervalId);
-  }, [poolEndDate]);
+  }, [gameState.poolEndDate]);
+
+  useEffect(() => {
+    const storedGameState = localStorage.getItem("game");
+    if (storedGameState) setGameState(JSON.parse(storedGameState));
+  }, []);
 
   return (
     <BettingSlipsContext.Provider
       value={{
-        slips,
         addSlip,
         removeSlip,
         updateSlip,
-        hasEnteredPool,
-        hasPoolStarted,
-        poolId,
-        setHasEnteredPool,
         setPoolId,
-        setHasPoolStarted,
-        hasPoolEnded,
-        poolEndDate,
+        setHasEnteredPool,
+        ...gameState,
       }}
     >
       {children}

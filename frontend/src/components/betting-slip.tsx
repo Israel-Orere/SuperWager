@@ -28,10 +28,11 @@ export default function BettingSlip() {
     poolId,
     hasEnteredPool,
     hasPoolStarted,
-    setHasEnteredPool,
-    removeSlip,
     hasPoolEnded,
     poolEndDate,
+    hasWon,
+    setHasEnteredPool,
+    removeSlip,
   } = useBettingSlips();
 
   const [showEnterPoolModal, setShowEnterPoolModal] = useState(false);
@@ -67,10 +68,7 @@ export default function BettingSlip() {
     return (
       <p className="text-center text-2xl font-medium">
         No betting slip available,{" "}
-        <Link
-          href={"/create-slip?tab=upcoming"}
-          className="text-[var(--primary)]"
-        >
+        <Link href={"/create-slip"} className="text-[var(--primary)]">
           Create Slip
         </Link>
       </p>
@@ -112,6 +110,18 @@ export default function BettingSlip() {
                   setHasEnteredPool(true);
                   toast.success("You have entered the pool");
                   setShowEnterPoolModal(false);
+                  localStorage.setItem(
+                    "game",
+                    JSON.stringify({
+                      slips,
+                      poolId,
+                      hasEnteredPool,
+                      hasPoolStarted,
+                      hasPoolEnded,
+                      poolEndDate,
+                      hasWon,
+                    })
+                  );
                 }}
                 className="text-lg font-normal bg-[var(--primary)] rounded-lg px-3.5 py-4 text-white capitalize hover:bg-[var(--primary)]/80"
               >
@@ -162,7 +172,7 @@ export default function BettingSlip() {
             {!hasPoolStarted && (
               <button
                 onClick={() => {
-                  if (hasEnteredPool) router.push("/create-slip?tab=upcoming");
+                  if (hasEnteredPool) router.push("/create-slip");
                   else setShowEnterPoolModal(true);
                 }}
                 className="text-lg font-normal bg-[var(--primary)] rounded-lg px-3.5 py-4 text-white capitalize hover:bg-[var(--primary)]/80"
