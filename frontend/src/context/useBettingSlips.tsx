@@ -25,6 +25,10 @@ const BettingSlipsContext = createContext<
       updateSlip: (index: number, updatedSlip: BettingSlip) => void;
       setHasEnteredPool: (val: boolean) => void;
       setPoolId: (val: string) => void;
+      updateGameOutcome: (
+        outcome: "pending" | "won" | "lost",
+        i: number
+      ) => void;
       slips: BettingSlip[];
       hasEnteredPool: boolean;
       hasPoolStarted: boolean;
@@ -101,6 +105,18 @@ export const BettingSlipsProvider: React.FC<{ children: ReactNode }> = ({
     setGameState((prev) => ({ ...prev, hasEnteredPool: val }));
   };
 
+  const updateGameOutcome = (
+    outcome: "pending" | "won" | "lost",
+    i: number
+  ) => {
+    setGameState((prev) => ({
+      ...prev,
+      slips: prev.slips.map((slip, idx) =>
+        idx === i ? { ...slip, outcome } : slip
+      ),
+    }));
+  };
+
   useEffect(() => {
     if (gameState.hasPoolStarted) return;
 
@@ -119,16 +135,19 @@ export const BettingSlipsProvider: React.FC<{ children: ReactNode }> = ({
   }, [gameState.slips, gameState.hasEnteredPool, gameState.hasPoolStarted]);
 
   useEffect(() => {
-    if (gameState.slips.length > 0 && gameState.hasEnteredPool) {
-      const latestMatchDate = gameState.slips.reduce(
-        (latest, slip) =>
-          new Date(slip.matchDate) > latest ? new Date(slip.matchDate) : latest,
-        new Date(0)
-      );
-      const endDate = new Date(latestMatchDate);
-      endDate.setHours(endDate.getHours() + 2);
-      setGameState((prev) => ({ ...prev, poolEndDate: endDate.toISOString() }));
-    } else setGameState((prev) => ({ ...prev, poolEndDate: null }));
+    if (!gameState.slips.length && !gameState.hasEnteredPool) {
+      setGameState((prev) => ({ ...prev, poolEndDate: null }));
+      return;
+    }
+
+    const latestMatchDate = gameState.slips.reduce(
+      (latest, slip) =>
+        new Date(slip.matchDate) > latest ? new Date(slip.matchDate) : latest,
+      new Date(0)
+    );
+    const endDate = new Date(latestMatchDate);
+    endDate.setHours(endDate.getHours() + 2);
+    setGameState((prev) => ({ ...prev, poolEndDate: endDate.toISOString() }));
   }, [gameState.slips, gameState.hasEnteredPool]);
 
   useEffect(() => {
@@ -147,6 +166,25 @@ export const BettingSlipsProvider: React.FC<{ children: ReactNode }> = ({
   }, [gameState.poolEndDate]);
 
   useEffect(() => {
+    if (
+      !gameState.hasPoolEnded ||
+      gameState.hasWon !== "pending" ||
+      gameState.slips.length > 0
+    )
+      return;
+
+    if (gameState.slips.some((slip) => slip.outcome === "lost")) {
+      setGameState((prev) => ({ ...prev, hasWon: "lost" }));
+      return;
+    }
+
+    if (gameState.slips.every((slip) => slip.outcome === "won")) {
+      setGameState((prev) => ({ ...prev, hasWon: "won" }));
+      return;
+    }
+  }, [gameState.hasPoolEnded, gameState.slips, gameState.hasWon]);
+
+  useEffect(() => {
     const storedGameState = localStorage.getItem("game");
     if (storedGameState) setGameState(JSON.parse(storedGameState));
   }, []);
@@ -163,6 +201,7 @@ export const BettingSlipsProvider: React.FC<{ children: ReactNode }> = ({
         updateSlip,
         setPoolId,
         setHasEnteredPool,
+        updateGameOutcome,
         ...gameState,
       }}
     >

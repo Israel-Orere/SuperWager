@@ -20,3 +20,6 @@ export const radar_leagues = [
   },
   { id: "sr:competition:35", name: "Bundesliga" },
 ];
+
+// season-schedule endpoint for past current and future data
+// odds - tournament endpoint for all current and future odds

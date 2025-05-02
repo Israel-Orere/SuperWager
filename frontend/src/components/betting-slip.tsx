@@ -33,6 +33,7 @@ export default function BettingSlip() {
     hasWon,
     setHasEnteredPool,
     removeSlip,
+    updateGameOutcome,
   } = useBettingSlips();
 
   const [showEnterPoolModal, setShowEnterPoolModal] = useState(false);
@@ -40,8 +41,9 @@ export default function BettingSlip() {
   const [betslipLeagues, setBetslipLeagues] = useState<LeagueKey[]>([]);
 
   useEffect(() => {
-    setBetslipLeagues([...new Set(slips.map((slip) => slip.league_key))]);
-  }, []);
+    if (slips)
+      setBetslipLeagues([...new Set(slips.map((slip) => slip.league_key))]);
+  }, [slips]);
 
   const { data: scoresData = [] } = useQuery<ScoresDataType[]>({
     queryKey: ["scores", betslipLeagues],
@@ -53,6 +55,7 @@ export default function BettingSlip() {
       );
       return results.flat();
     },
+    refetchOnWindowFocus: true,
     // staleTime: 10000,
   });
 
@@ -76,6 +79,16 @@ export default function BettingSlip() {
 
   return (
     <>
+      {hasWon !== "pending" && (
+        <div className="fixed inset-0 items-center justify-center flex z-50">
+          <div className="absolute inset-0 bg-black/50" />
+          <div className="bg-white rounded-[20px] p-10 relative flex flex-col items-center justify-center gap-10">
+            <p className="text-xl font-semibold">
+              You {hasWon === "lost" ? "Lose" : "Won"}
+            </p>
+          </div>
+        </div>
+      )}
       {showEnterPoolModal && (
         <div className="fixed inset-0 items-center justify-center flex z-50">
           <div className="absolute inset-0 bg-black/50" />
@@ -267,7 +280,11 @@ export default function BettingSlip() {
                             match.home_team === game.homeTeam
                         )?.scores;
 
-                        if (!currentScores) return <PendingIcon />;
+                        if (
+                          !currentScores ||
+                          new Date(game.matchDate) > new Date()
+                        )
+                          return <PendingIcon />;
 
                         const homeScore = currentScores.find(
                           (item) => item.name === game.homeTeam
@@ -286,9 +303,13 @@ export default function BettingSlip() {
                           (selection === "home" && isHomeWin) ||
                           (selection === "away" && isAwayWin) ||
                           (selection === "draw" && isDraw)
-                        )
+                        ) {
+                          updateGameOutcome("won", i);
                           return <GreenCheckIcon />;
-                        else return <RedXIcon />;
+                        } else {
+                          updateGameOutcome("lost", i);
+                          return <RedXIcon />;
+                        }
                       })()}
                     </>
                   )}
