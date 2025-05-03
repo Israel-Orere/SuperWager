@@ -2,10 +2,10 @@
 
 import React, {
   createContext,
-  useContext,
-  useState,
   ReactNode,
+  useContext,
   useEffect,
+  useState,
 } from "react";
 
 export interface BettingSlip {
@@ -13,16 +13,15 @@ export interface BettingSlip {
   awayTeam: string;
   matchDate: string;
   selection: "home" | "away" | "draw";
-  odds: number;
+  odds: string;
   outcome: "pending" | "won" | "lost";
-  league_key: LeagueKey;
+  league_key: string;
 }
 
 const BettingSlipsContext = createContext<
   | {
       addSlip: (slip: BettingSlip) => void;
       removeSlip: (slip: BettingSlip) => void;
-      updateSlip: (index: number, updatedSlip: BettingSlip) => void;
       setHasEnteredPool: (val: boolean) => void;
       setPoolId: (val: string) => void;
       updateGameOutcome: (
@@ -87,13 +86,6 @@ export const BettingSlipsProvider: React.FC<{ children: ReactNode }> = ({
       slips: updatedSlips,
       poolId: updatedSlips.length === 0 ? null : prev.poolId,
       hasEnteredPool: updatedSlips.length === 0 ? false : prev.hasEnteredPool,
-    }));
-  };
-
-  const updateSlip = (index: number, updatedSlip: BettingSlip) => {
-    setGameState((prev) => ({
-      ...prev,
-      slips: prev.slips.map((slip, i) => (i === index ? updatedSlip : slip)),
     }));
   };
 
@@ -198,7 +190,6 @@ export const BettingSlipsProvider: React.FC<{ children: ReactNode }> = ({
       value={{
         addSlip,
         removeSlip,
-        updateSlip,
         setPoolId,
         setHasEnteredPool,
         updateGameOutcome,

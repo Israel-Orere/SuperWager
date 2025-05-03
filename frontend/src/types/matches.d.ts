@@ -1,47 +1,40 @@
-interface ScoresDataType {
-  id: string;
-  completed: boolean;
-  home_team: string;
-  away_team: string;
-  scores: EnhancedTeamScore[] | null;
+interface SportEventSchedule {
+  schedules: Schedule[];
 }
 
-interface EnhancedTeamScore {
-  name: string;
-  score: string;
+interface Schedule {
+  sport_event: {
+    id: string;
+    start_time: string;
+    start_time_confirmed: boolean;
+    competitors: { name: string }[];
+  };
+  sport_event_status: {
+    status: string;
+    match_status: string;
+    home_score?: number;
+    away_score?: number;
+    clock?: { played: string };
+  };
 }
 
-interface MatchesType {
-  id: string;
-  sport_key: string;
-  sport_title: string;
-  commence_time: string;
-  home_team: string;
-  away_team: string;
-  bookmakers: Bookmaker[];
+interface SportOddsData {
+  sport_events: {
+    id: string;
+    competitors: { name: string }[];
+    markets: OddsData[];
+  }[];
 }
 
-interface Bookmaker {
-  key: string;
-  title: string;
-  last_update: string;
-  link: string | null;
-  sid: string | null;
-  markets: Market[];
+interface OddsData {
+  books: Book[];
 }
 
-interface Market {
-  key: string;
-  last_update: string;
-  link: string | null;
-  sid: string | null;
+interface Book {
   outcomes: Outcome[];
 }
 
 interface Outcome {
-  name: string;
-  price: number;
-  link: string | null;
-  sid: string | null;
-  bet_limit: number | null;
+  type: "home" | "draw" | "away";
+  odds: string;
 }

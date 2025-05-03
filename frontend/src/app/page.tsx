@@ -1,8 +1,8 @@
+import bg from "@/assets/images/background.jpg";
+import mascot from "@/assets/images/mascot.png";
 import LeaderboardTable from "@/components/leaderboard-table";
 import { MiniMatchesTable } from "@/components/matches-table";
 import Image from "next/image";
-import mascot from "@/assets/images/mascot.png";
-import bg from "@/assets/images/background.jpg";
 
 export default function Home() {
   return (
