@@ -3,7 +3,7 @@
 import CalendarIcon from "@/assets/svgs/calendar";
 import FootballPitchIcon from "@/assets/svgs/football-pitch";
 import GreaterThanIcon from "@/assets/svgs/greater-than";
-import { BettingSlip, useBettingSlips } from "@/context/useBettingSlips";
+import { useBettingSlips } from "@/context/useBettingSlips";
 import { useMatches } from "@/context/useMatchesContext";
 import { radar_leagues } from "@/utils/constant";
 import { daysArray } from "@/utils/utils";
@@ -100,7 +100,7 @@ export default function MatchesTable() {
           </span>
         </div>
 
-        {!hasEnteredPool && (
+        {!hasPoolStarted && (
           <button
             onClick={createSlip}
             className="text-lg font-normal bg-[var(--primary)] rounded-lg py-3 px-4 text-white capitalize hover:bg-[var(--primary)]/80"

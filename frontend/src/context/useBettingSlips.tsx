@@ -8,33 +8,21 @@ import React, {
   useState,
 } from "react";
 
-export interface BettingSlip {
-  homeTeam: string;
-  awayTeam: string;
-  matchDate: string;
-  selection: "home" | "away" | "draw";
-  odds: string;
-  outcome: "pending" | "won" | "lost";
-  league_key: string;
-}
-
 const BettingSlipsContext = createContext<
   | {
       addSlip: (slip: BettingSlip) => void;
       removeSlip: (slip: BettingSlip) => void;
       setHasEnteredPool: (val: boolean) => void;
+      updateSlipStatus: (val: boolean) => void;
       setPoolId: (val: string) => void;
-      updateGameOutcome: (
-        outcome: "pending" | "won" | "lost",
-        i: number
-      ) => void;
+      updateGameOutcome: (outcome: MatchOutcome, i: number) => void;
+      resetSlip: () => void;
       slips: BettingSlip[];
       hasEnteredPool: boolean;
       hasPoolStarted: boolean;
       poolId: string | null;
       hasPoolEnded: boolean;
-      poolEndDate: string | null;
-      hasWon: "pending" | "lost" | "won";
+      hasWon: MatchOutcome;
     }
   | undefined
 >(undefined);
@@ -45,8 +33,7 @@ const initialState = {
   poolId: null,
   hasPoolStarted: false,
   hasPoolEnded: false,
-  poolEndDate: null,
-  hasWon: "pending" as "pending" | "lost" | "won",
+  hasWon: "pending" as MatchOutcome,
 };
 
 type GameState = {
@@ -55,14 +42,24 @@ type GameState = {
   poolId: string | null;
   hasPoolStarted: boolean;
   hasPoolEnded: boolean;
-  poolEndDate: string | null;
-  hasWon: "pending" | "lost" | "won";
+  hasWon: MatchOutcome;
 };
 
 export const BettingSlipsProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
   const [gameState, setGameState] = useState<GameState>(initialState);
+
+  const resetSlip = () => {
+    const history = [
+      gameState,
+      ...JSON.parse(localStorage.getItem("history") || "[]"),
+    ];
+
+    localStorage.setItem("history", JSON.stringify(history));
+
+    setGameState(initialState);
+  };
 
   const addSlip = (slip: BettingSlip) => {
     setGameState((prev) => ({
@@ -97,6 +94,10 @@ export const BettingSlipsProvider: React.FC<{ children: ReactNode }> = ({
     setGameState((prev) => ({ ...prev, hasEnteredPool: val }));
   };
 
+  const updateSlipStatus = (val: boolean) => {
+    setGameState((prev) => ({ ...prev, hasPoolEnded: val }));
+  };
+
   const updateGameOutcome = (
     outcome: "pending" | "won" | "lost",
     i: number
@@ -125,37 +126,6 @@ export const BettingSlipsProvider: React.FC<{ children: ReactNode }> = ({
 
     return () => clearInterval(interval);
   }, [gameState.slips, gameState.hasEnteredPool, gameState.hasPoolStarted]);
-
-  useEffect(() => {
-    if (!gameState.slips.length && !gameState.hasEnteredPool) {
-      setGameState((prev) => ({ ...prev, poolEndDate: null }));
-      return;
-    }
-
-    const latestMatchDate = gameState.slips.reduce(
-      (latest, slip) =>
-        new Date(slip.matchDate) > latest ? new Date(slip.matchDate) : latest,
-      new Date(0)
-    );
-    const endDate = new Date(latestMatchDate);
-    endDate.setHours(endDate.getHours() + 2);
-    setGameState((prev) => ({ ...prev, poolEndDate: endDate.toISOString() }));
-  }, [gameState.slips, gameState.hasEnteredPool]);
-
-  useEffect(() => {
-    if (!gameState.poolEndDate) return;
-    const checkPoolEnded = () => {
-      const now = new Date();
-      const endDate = new Date(gameState.poolEndDate!);
-      if (now >= endDate) {
-        setGameState((prev) => ({ ...prev, hasPoolEnded: true }));
-        clearInterval(intervalId);
-      }
-    };
-    checkPoolEnded();
-    const intervalId = setInterval(checkPoolEnded, 5000);
-    return () => clearInterval(intervalId);
-  }, [gameState.poolEndDate]);
 
   useEffect(() => {
     if (
@@ -192,7 +162,9 @@ export const BettingSlipsProvider: React.FC<{ children: ReactNode }> = ({
         removeSlip,
         setPoolId,
         setHasEnteredPool,
+        updateSlipStatus,
         updateGameOutcome,
+        resetSlip,
         ...gameState,
       }}
     >

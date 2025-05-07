@@ -1,3 +1,16 @@
+type MatchOutcome = "pending" | "won" | "lost";
+type MatchSelection = "home" | "away" | "draw";
+
+interface BettingSlip {
+  homeTeam: string;
+  awayTeam: string;
+  matchDate: string;
+  selection: MatchSelection;
+  odds: string;
+  outcome: MatchOutcome;
+  league_key: string;
+}
+
 interface SportEventSchedule {
   schedules: Schedule[];
 }
