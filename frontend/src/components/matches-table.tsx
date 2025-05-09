@@ -170,305 +170,306 @@ export default function MatchesTable() {
       )}
 
       <div>
-        {matches.map((match, i) => (
-          <div
-            key={i}
-            className="w-full px-8 py-6 border-b border-b-[var(--primary)]/30 flex items-center justify-between"
-          >
-            <div className="flex items-center gap-8">
-              <div className="flex flex-col items-center justify-center">
-                <p className="flex flex-col items-center justify-center gap-1 w-20">
-                  {match.sport_event_status.match_status === "ended" ? (
-                    "FT"
-                  ) : (
-                    <>
-                      {match.sport_event_status.status === "live" ? (
-                        <>
-                          <span className="text-[#32FF40]">
-                            {match.sport_event_status.clock?.played}
-                          </span>
-                          <span className="capitalize text-[#32FF40]">
-                            {match.sport_event_status.match_status ===
-                            "1st_half"
-                              ? "1st"
-                              : match.sport_event_status.match_status ===
-                                "halftime"
-                              ? "HT"
-                              : "2nd"}
-                          </span>
-                        </>
-                      ) : (
-                        <>
-                          <span>
-                            {new Date(
-                              match.sport_event.start_time
-                            ).toLocaleDateString("en-GB", {
-                              day: "2-digit",
-                              month: "2-digit",
-                              year: "2-digit",
-                            })}
-                          </span>
-                          <span>
-                            {`${new Date(match.sport_event.start_time)
-                              .getHours()
-                              .toString()
-                              .padStart(2, "0")}:${new Date(
-                              match.sport_event.start_time
-                            )
-                              .getMinutes()
-                              .toString()
-                              .padStart(2, "0")}`}
-                          </span>
-                        </>
-                      )}
-                    </>
-                  )}
-                </p>
+        {!isLoading &&
+          matches.map((match, i) => (
+            <div
+              key={i}
+              className="w-full px-8 py-6 border-b border-b-[var(--primary)]/30 flex items-center justify-between"
+            >
+              <div className="flex items-center gap-8">
+                <div className="flex flex-col items-center justify-center">
+                  <p className="flex flex-col items-center justify-center gap-1 w-20">
+                    {match.sport_event_status.match_status === "ended" ? (
+                      "FT"
+                    ) : (
+                      <>
+                        {match.sport_event_status.status === "live" ? (
+                          <>
+                            <span className="text-[#32FF40]">
+                              {match.sport_event_status.clock?.played}
+                            </span>
+                            <span className="capitalize text-[#32FF40]">
+                              {match.sport_event_status.match_status ===
+                              "1st_half"
+                                ? "1st"
+                                : match.sport_event_status.match_status ===
+                                  "halftime"
+                                ? "HT"
+                                : "2nd"}
+                            </span>
+                          </>
+                        ) : (
+                          <>
+                            <span>
+                              {new Date(
+                                match.sport_event.start_time
+                              ).toLocaleDateString("en-GB", {
+                                day: "2-digit",
+                                month: "2-digit",
+                                year: "2-digit",
+                              })}
+                            </span>
+                            <span>
+                              {`${new Date(match.sport_event.start_time)
+                                .getHours()
+                                .toString()
+                                .padStart(2, "0")}:${new Date(
+                                match.sport_event.start_time
+                              )
+                                .getMinutes()
+                                .toString()
+                                .padStart(2, "0")}`}
+                            </span>
+                          </>
+                        )}
+                      </>
+                    )}
+                  </p>
+                </div>
+                <div className="text-xl flex flex-col gap-2 justify-center">
+                  <span>{match.sport_event.competitors[0].name}</span>
+                  <span>{match.sport_event.competitors[1].name}</span>
+                </div>
               </div>
-              <div className="text-xl flex flex-col gap-2 justify-center">
-                <span>{match.sport_event.competitors[0].name}</span>
-                <span>{match.sport_event.competitors[1].name}</span>
+              <div className="flex items-center gap-8">
+                <div className="text-xl flex flex-col gap-2 items-center justify-center">
+                  <span>
+                    {match.sport_event_status.status === "not_started"
+                      ? "-"
+                      : match.sport_event_status.home_score}
+                  </span>
+                  <span>
+                    {match.sport_event_status.status === "not_started"
+                      ? "-"
+                      : match.sport_event_status.away_score}
+                  </span>
+                </div>
+                <span>
+                  <FootballPitchIcon />
+                </span>
+                <div className="flex items-center gap-4 [&>div>p:nth-child(2)]:cursor-pointer">
+                  <div className="flex items-center flex-col gap-1 justify-center">
+                    <p className="text-sm">1</p>
+                    <p
+                      className={`${
+                        slips.find(
+                          (item) =>
+                            item.homeTeam ===
+                              match.sport_event.competitors[0].name &&
+                            item.awayTeam ===
+                              match.sport_event.competitors[1].name &&
+                            item.selection === "home"
+                        )
+                          ? "bg-[var(--primary)] text-white"
+                          : "bg-[var(--primary-light)]"
+                      } p-2.5 rounded-sm w-12 flex items-center justify-center`}
+                      onClick={() => {
+                        if (match.sport_event_status.match_status === "ended") {
+                          toast.error("Match ended, cannot add match to slip");
+                          return;
+                        }
+                        slips.find(
+                          (item) =>
+                            item.homeTeam ===
+                              match.sport_event.competitors[0].name &&
+                            item.awayTeam ===
+                              match.sport_event.competitors[1].name &&
+                            item.selection === "home"
+                        )
+                          ? removeFromSlip({
+                              homeTeam: match.sport_event.competitors[0].name,
+                              awayTeam: match.sport_event.competitors[1].name,
+                              selection: "home",
+                            })
+                          : addToSlip({
+                              homeTeam: match.sport_event.competitors[0].name,
+                              awayTeam: match.sport_event.competitors[1].name,
+                              matchDate: new Date(
+                                match.sport_event.start_time
+                              ).toString(),
+                              odds:
+                                odds.find(
+                                  (event) =>
+                                    event.competitors[0].name ===
+                                      match.sport_event.competitors[0].name &&
+                                    event.competitors[1].name ===
+                                      match.sport_event.competitors[1].name
+                                )?.markets[0].books[0].outcomes[0].odds || "",
+                              outcome: "pending",
+                              selection: "home",
+                              league_key: radar_leagues[league].season_id,
+                            });
+                      }}
+                    >
+                      {match.sport_event_status.match_status !== "ended"
+                        ? (() => {
+                            const foundEvent = odds.find(
+                              (event) =>
+                                event.competitors[0].name ===
+                                  match.sport_event.competitors[0].name &&
+                                event.competitors[1].name ===
+                                  match.sport_event.competitors[1].name
+                            );
+                            const oddsValue =
+                              foundEvent?.markets[0].books[0].outcomes[0].odds;
+                            return oddsValue
+                              ? parseFloat(oddsValue).toFixed(2)
+                              : "---";
+                          })()
+                        : "---"}
+                    </p>
+                  </div>
+                  <div className="flex items-center flex-col gap-1 justify-center">
+                    <p className="text-sm">X</p>
+                    <p
+                      className={`${
+                        slips.find(
+                          (item) =>
+                            item.homeTeam ===
+                              match.sport_event.competitors[0].name &&
+                            item.awayTeam ===
+                              match.sport_event.competitors[1].name &&
+                            item.selection === "draw"
+                        )
+                          ? "bg-[var(--primary)] text-white"
+                          : "bg-[var(--primary-light)]"
+                      } p-2.5 rounded-sm w-12 flex items-center justify-center`}
+                      onClick={() => {
+                        if (match.sport_event_status.match_status === "ended") {
+                          toast.error("Match ended, cannot add match to slip");
+                          return;
+                        }
+                        slips.find(
+                          (item) =>
+                            item.homeTeam ===
+                              match.sport_event.competitors[0].name &&
+                            item.awayTeam ===
+                              match.sport_event.competitors[1].name &&
+                            item.selection === "draw"
+                        )
+                          ? removeFromSlip({
+                              homeTeam: match.sport_event.competitors[0].name,
+                              awayTeam: match.sport_event.competitors[1].name,
+                              selection: "draw",
+                            })
+                          : addToSlip({
+                              homeTeam: match.sport_event.competitors[0].name,
+                              awayTeam: match.sport_event.competitors[1].name,
+                              matchDate: new Date(
+                                match.sport_event.start_time
+                              ).toString(),
+                              odds:
+                                odds.find(
+                                  (event) =>
+                                    event.competitors[0].name ===
+                                      match.sport_event.competitors[0].name &&
+                                    event.competitors[1].name ===
+                                      match.sport_event.competitors[1].name
+                                )?.markets[0].books[0].outcomes[1].odds || "",
+                              outcome: "pending",
+                              selection: "draw",
+                              league_key: radar_leagues[league].season_id,
+                            });
+                      }}
+                    >
+                      {match.sport_event_status.match_status !== "ended"
+                        ? (() => {
+                            const foundEvent = odds.find(
+                              (event) =>
+                                event.competitors[0].name ===
+                                  match.sport_event.competitors[0].name &&
+                                event.competitors[1].name ===
+                                  match.sport_event.competitors[1].name
+                            );
+                            const oddsValue =
+                              foundEvent?.markets?.[0]?.books?.[0]
+                                ?.outcomes?.[1]?.odds;
+                            return oddsValue
+                              ? parseFloat(oddsValue).toFixed(2)
+                              : "---";
+                          })()
+                        : "---"}
+                    </p>
+                  </div>
+                  <div className="flex items-center flex-col gap-1 justify-center">
+                    <p className="text-sm">2</p>
+                    <p
+                      className={`${
+                        slips.find(
+                          (item) =>
+                            item.homeTeam ===
+                              match.sport_event.competitors[0].name &&
+                            item.awayTeam ===
+                              match.sport_event.competitors[1].name &&
+                            item.selection === "away"
+                        )
+                          ? "bg-[var(--primary)] text-white"
+                          : "bg-[var(--primary-light)]"
+                      } p-2.5 rounded-sm w-12 flex items-center justify-center`}
+                      onClick={() => {
+                        if (match.sport_event_status.match_status === "ended") {
+                          toast.error("Match ended, cannot add match to slip");
+                          return;
+                        }
+                        slips.find(
+                          (item) =>
+                            item.homeTeam ===
+                              match.sport_event.competitors[0].name &&
+                            item.awayTeam ===
+                              match.sport_event.competitors[1].name &&
+                            item.selection === "away"
+                        )
+                          ? removeFromSlip({
+                              homeTeam: match.sport_event.competitors[0].name,
+                              awayTeam: match.sport_event.competitors[1].name,
+                              selection: "away",
+                            })
+                          : addToSlip({
+                              homeTeam: match.sport_event.competitors[0].name,
+                              awayTeam: match.sport_event.competitors[1].name,
+                              matchDate: new Date(
+                                match.sport_event.start_time
+                              ).toString(),
+                              odds:
+                                odds.find(
+                                  (event) =>
+                                    event.competitors[0].name ===
+                                      match.sport_event.competitors[0].name &&
+                                    event.competitors[1].name ===
+                                      match.sport_event.competitors[1].name
+                                )?.markets[0].books[0].outcomes[2].odds || "",
+                              outcome: "pending",
+                              selection: "away",
+                              league_key: radar_leagues[league].season_id,
+                            });
+                      }}
+                    >
+                      {match.sport_event_status.match_status !== "ended"
+                        ? (() => {
+                            const foundEvent = odds.find(
+                              (event) =>
+                                event.competitors[0].name ===
+                                  match.sport_event.competitors[0].name &&
+                                event.competitors[1].name ===
+                                  match.sport_event.competitors[1].name
+                            );
+                            const oddsValue =
+                              foundEvent?.markets?.[0]?.books?.[0]
+                                ?.outcomes?.[2]?.odds;
+                            return oddsValue
+                              ? parseFloat(oddsValue).toFixed(2)
+                              : "---";
+                          })()
+                        : "---"}
+                    </p>
+                  </div>
+                </div>
+                <span className="cursor-pointer">
+                  <GreaterThanIcon />
+                </span>
               </div>
             </div>
-            <div className="flex items-center gap-8">
-              <div className="text-xl flex flex-col gap-2 items-center justify-center">
-                <span>
-                  {match.sport_event_status.status === "not_started"
-                    ? "-"
-                    : match.sport_event_status.home_score}
-                </span>
-                <span>
-                  {match.sport_event_status.status === "not_started"
-                    ? "-"
-                    : match.sport_event_status.away_score}
-                </span>
-              </div>
-              <span>
-                <FootballPitchIcon />
-              </span>
-              <div className="flex items-center gap-4 [&>div>p:nth-child(2)]:cursor-pointer">
-                <div className="flex items-center flex-col gap-1 justify-center">
-                  <p className="text-sm">1</p>
-                  <p
-                    className={`${
-                      slips.find(
-                        (item) =>
-                          item.homeTeam ===
-                            match.sport_event.competitors[0].name &&
-                          item.awayTeam ===
-                            match.sport_event.competitors[1].name &&
-                          item.selection === "home"
-                      )
-                        ? "bg-[var(--primary)] text-white"
-                        : "bg-[var(--primary-light)]"
-                    } p-2.5 rounded-sm w-12 flex items-center justify-center`}
-                    onClick={() => {
-                      if (match.sport_event_status.match_status === "ended") {
-                        toast.error("Match ended, cannot add match to slip");
-                        return;
-                      }
-                      slips.find(
-                        (item) =>
-                          item.homeTeam ===
-                            match.sport_event.competitors[0].name &&
-                          item.awayTeam ===
-                            match.sport_event.competitors[1].name &&
-                          item.selection === "home"
-                      )
-                        ? removeFromSlip({
-                            homeTeam: match.sport_event.competitors[0].name,
-                            awayTeam: match.sport_event.competitors[1].name,
-                            selection: "home",
-                          })
-                        : addToSlip({
-                            homeTeam: match.sport_event.competitors[0].name,
-                            awayTeam: match.sport_event.competitors[1].name,
-                            matchDate: new Date(
-                              match.sport_event.start_time
-                            ).toString(),
-                            odds:
-                              odds.find(
-                                (event) =>
-                                  event.competitors[0].name ===
-                                    match.sport_event.competitors[0].name &&
-                                  event.competitors[1].name ===
-                                    match.sport_event.competitors[1].name
-                              )?.markets[0].books[0].outcomes[0].odds || "",
-                            outcome: "pending",
-                            selection: "home",
-                            league_key: radar_leagues[league].season_id,
-                          });
-                    }}
-                  >
-                    {match.sport_event_status.match_status !== "ended"
-                      ? (() => {
-                          const foundEvent = odds.find(
-                            (event) =>
-                              event.competitors[0].name ===
-                                match.sport_event.competitors[0].name &&
-                              event.competitors[1].name ===
-                                match.sport_event.competitors[1].name
-                          );
-                          const oddsValue =
-                            foundEvent?.markets[0].books[0].outcomes[0].odds;
-                          return oddsValue
-                            ? parseFloat(oddsValue).toFixed(2)
-                            : "---";
-                        })()
-                      : "---"}
-                  </p>
-                </div>
-                <div className="flex items-center flex-col gap-1 justify-center">
-                  <p className="text-sm">X</p>
-                  <p
-                    className={`${
-                      slips.find(
-                        (item) =>
-                          item.homeTeam ===
-                            match.sport_event.competitors[0].name &&
-                          item.awayTeam ===
-                            match.sport_event.competitors[1].name &&
-                          item.selection === "draw"
-                      )
-                        ? "bg-[var(--primary)] text-white"
-                        : "bg-[var(--primary-light)]"
-                    } p-2.5 rounded-sm w-12 flex items-center justify-center`}
-                    onClick={() => {
-                      if (match.sport_event_status.match_status === "ended") {
-                        toast.error("Match ended, cannot add match to slip");
-                        return;
-                      }
-                      slips.find(
-                        (item) =>
-                          item.homeTeam ===
-                            match.sport_event.competitors[0].name &&
-                          item.awayTeam ===
-                            match.sport_event.competitors[1].name &&
-                          item.selection === "draw"
-                      )
-                        ? removeFromSlip({
-                            homeTeam: match.sport_event.competitors[0].name,
-                            awayTeam: match.sport_event.competitors[1].name,
-                            selection: "draw",
-                          })
-                        : addToSlip({
-                            homeTeam: match.sport_event.competitors[0].name,
-                            awayTeam: match.sport_event.competitors[1].name,
-                            matchDate: new Date(
-                              match.sport_event.start_time
-                            ).toString(),
-                            odds:
-                              odds.find(
-                                (event) =>
-                                  event.competitors[0].name ===
-                                    match.sport_event.competitors[0].name &&
-                                  event.competitors[1].name ===
-                                    match.sport_event.competitors[1].name
-                              )?.markets[0].books[0].outcomes[1].odds || "",
-                            outcome: "pending",
-                            selection: "draw",
-                            league_key: radar_leagues[league].season_id,
-                          });
-                    }}
-                  >
-                    {match.sport_event_status.match_status !== "ended"
-                      ? (() => {
-                          const foundEvent = odds.find(
-                            (event) =>
-                              event.competitors[0].name ===
-                                match.sport_event.competitors[0].name &&
-                              event.competitors[1].name ===
-                                match.sport_event.competitors[1].name
-                          );
-                          const oddsValue =
-                            foundEvent?.markets?.[0]?.books?.[0]?.outcomes?.[1]
-                              ?.odds;
-                          return oddsValue
-                            ? parseFloat(oddsValue).toFixed(2)
-                            : "---";
-                        })()
-                      : "---"}
-                  </p>
-                </div>
-                <div className="flex items-center flex-col gap-1 justify-center">
-                  <p className="text-sm">2</p>
-                  <p
-                    className={`${
-                      slips.find(
-                        (item) =>
-                          item.homeTeam ===
-                            match.sport_event.competitors[0].name &&
-                          item.awayTeam ===
-                            match.sport_event.competitors[1].name &&
-                          item.selection === "away"
-                      )
-                        ? "bg-[var(--primary)] text-white"
-                        : "bg-[var(--primary-light)]"
-                    } p-2.5 rounded-sm w-12 flex items-center justify-center`}
-                    onClick={() => {
-                      if (match.sport_event_status.match_status === "ended") {
-                        toast.error("Match ended, cannot add match to slip");
-                        return;
-                      }
-                      slips.find(
-                        (item) =>
-                          item.homeTeam ===
-                            match.sport_event.competitors[0].name &&
-                          item.awayTeam ===
-                            match.sport_event.competitors[1].name &&
-                          item.selection === "away"
-                      )
-                        ? removeFromSlip({
-                            homeTeam: match.sport_event.competitors[0].name,
-                            awayTeam: match.sport_event.competitors[1].name,
-                            selection: "away",
-                          })
-                        : addToSlip({
-                            homeTeam: match.sport_event.competitors[0].name,
-                            awayTeam: match.sport_event.competitors[1].name,
-                            matchDate: new Date(
-                              match.sport_event.start_time
-                            ).toString(),
-                            odds:
-                              odds.find(
-                                (event) =>
-                                  event.competitors[0].name ===
-                                    match.sport_event.competitors[0].name &&
-                                  event.competitors[1].name ===
-                                    match.sport_event.competitors[1].name
-                              )?.markets[0].books[0].outcomes[2].odds || "",
-                            outcome: "pending",
-                            selection: "away",
-                            league_key: radar_leagues[league].season_id,
-                          });
-                    }}
-                  >
-                    {match.sport_event_status.match_status !== "ended"
-                      ? (() => {
-                          const foundEvent = odds.find(
-                            (event) =>
-                              event.competitors[0].name ===
-                                match.sport_event.competitors[0].name &&
-                              event.competitors[1].name ===
-                                match.sport_event.competitors[1].name
-                          );
-                          const oddsValue =
-                            foundEvent?.markets?.[0]?.books?.[0]?.outcomes?.[2]
-                              ?.odds;
-                          return oddsValue
-                            ? parseFloat(oddsValue).toFixed(2)
-                            : "---";
-                        })()
-                      : "---"}
-                  </p>
-                </div>
-              </div>
-              <span className="cursor-pointer">
-                <GreaterThanIcon />
-              </span>
-            </div>
-          </div>
-        ))}
+          ))}
       </div>
     </div>
   );
@@ -553,156 +554,157 @@ export function MiniMatchesTable() {
         )}
 
         <div>
-          {matches.map((match, i) => (
-            <div
-              key={i}
-              className="w-full px-8 py-6 border-b border-b-[var(--primary)]/30 flex items-center justify-between"
-            >
-              <div className="flex items-center gap-8">
-                <div className="flex flex-col items-center justify-center">
-                  <p className="flex flex-col items-center justify-center gap-1 w-20">
-                    {match.sport_event_status.match_status === "ended" ? (
-                      "FT"
-                    ) : (
-                      <>
-                        {match.sport_event_status.status === "live" ? (
-                          <>
-                            <span className="text-[#32FF40]">
-                              {match.sport_event_status.clock?.played}
-                            </span>
-                            <span className="capitalize text-[#32FF40]">
-                              {match.sport_event_status.match_status ===
-                              "1st_half"
-                                ? "1st"
-                                : match.sport_event_status.match_status ===
-                                  "halftime"
-                                ? "HT"
-                                : "2nd"}
-                            </span>
-                          </>
-                        ) : (
-                          <>
-                            <span>
-                              {new Date(
-                                match.sport_event.start_time
-                              ).toLocaleDateString("en-GB", {
-                                day: "2-digit",
-                                month: "2-digit",
-                                year: "2-digit",
-                              })}
-                            </span>
-                            <span>
-                              {`${new Date(match.sport_event.start_time)
-                                .getHours()
-                                .toString()
-                                .padStart(2, "0")}:${new Date(
-                                match.sport_event.start_time
-                              )
-                                .getMinutes()
-                                .toString()
-                                .padStart(2, "0")}`}
-                            </span>
-                          </>
-                        )}
-                      </>
-                    )}
-                  </p>
+          {!isLoading &&
+            matches.map((match, i) => (
+              <div
+                key={i}
+                className="w-full px-8 py-6 border-b border-b-[var(--primary)]/30 flex items-center justify-between"
+              >
+                <div className="flex items-center gap-8">
+                  <div className="flex flex-col items-center justify-center">
+                    <p className="flex flex-col items-center justify-center gap-1 w-20">
+                      {match.sport_event_status.match_status === "ended" ? (
+                        "FT"
+                      ) : (
+                        <>
+                          {match.sport_event_status.status === "live" ? (
+                            <>
+                              <span className="text-[#32FF40]">
+                                {match.sport_event_status.clock?.played}
+                              </span>
+                              <span className="capitalize text-[#32FF40]">
+                                {match.sport_event_status.match_status ===
+                                "1st_half"
+                                  ? "1st"
+                                  : match.sport_event_status.match_status ===
+                                    "halftime"
+                                  ? "HT"
+                                  : "2nd"}
+                              </span>
+                            </>
+                          ) : (
+                            <>
+                              <span>
+                                {new Date(
+                                  match.sport_event.start_time
+                                ).toLocaleDateString("en-GB", {
+                                  day: "2-digit",
+                                  month: "2-digit",
+                                  year: "2-digit",
+                                })}
+                              </span>
+                              <span>
+                                {`${new Date(match.sport_event.start_time)
+                                  .getHours()
+                                  .toString()
+                                  .padStart(2, "0")}:${new Date(
+                                  match.sport_event.start_time
+                                )
+                                  .getMinutes()
+                                  .toString()
+                                  .padStart(2, "0")}`}
+                              </span>
+                            </>
+                          )}
+                        </>
+                      )}
+                    </p>
+                  </div>
+                  <div className="text-xl flex flex-col gap-2 justify-center">
+                    <span>{match.sport_event.competitors[0].name}</span>
+                    <span>{match.sport_event.competitors[1].name}</span>
+                  </div>
                 </div>
-                <div className="text-xl flex flex-col gap-2 justify-center">
-                  <span>{match.sport_event.competitors[0].name}</span>
-                  <span>{match.sport_event.competitors[1].name}</span>
+                <div className="flex items-center gap-8">
+                  <div className="text-xl flex flex-col gap-2 items-center justify-center">
+                    <span>
+                      {match.sport_event_status.status === "not_started"
+                        ? "-"
+                        : match.sport_event_status.home_score}
+                    </span>
+                    <span>
+                      {match.sport_event_status.status === "not_started"
+                        ? "-"
+                        : match.sport_event_status.away_score}
+                    </span>
+                  </div>
+                  <span>
+                    <FootballPitchIcon />
+                  </span>
+                  <div className="flex items-center gap-4 [&>div>p:nth-child(2)]:cursor-pointer">
+                    <div className="flex items-center flex-col gap-1 justify-center">
+                      <p className="text-sm">1</p>
+                      <p className="bg-[var(--primary-light)] p-2.5 rounded-sm w-12 flex items-center justify-center">
+                        {match.sport_event_status.match_status !== "ended"
+                          ? (() => {
+                              const foundEvent = odds.find(
+                                (event) =>
+                                  event.competitors[0].name ===
+                                    match.sport_event.competitors[0].name &&
+                                  event.competitors[1].name ===
+                                    match.sport_event.competitors[1].name
+                              );
+                              const oddsValue =
+                                foundEvent?.markets?.[0]?.books?.[0]
+                                  ?.outcomes?.[0]?.odds;
+                              return oddsValue
+                                ? parseFloat(oddsValue).toFixed(2)
+                                : "---";
+                            })()
+                          : "---"}
+                      </p>
+                    </div>
+                    <div className="flex items-center flex-col gap-1 justify-center">
+                      <p className="text-sm">X</p>
+                      <p className="bg-[var(--primary-light)] p-2.5 rounded-sm w-12 flex items-center justify-center">
+                        {match.sport_event_status.match_status !== "ended"
+                          ? (() => {
+                              const foundEvent = odds.find(
+                                (event) =>
+                                  event.competitors[0].name ===
+                                    match.sport_event.competitors[0].name &&
+                                  event.competitors[1].name ===
+                                    match.sport_event.competitors[1].name
+                              );
+                              const oddsValue =
+                                foundEvent?.markets?.[0]?.books?.[0]
+                                  ?.outcomes?.[1]?.odds;
+                              return oddsValue
+                                ? parseFloat(oddsValue).toFixed(2)
+                                : "---";
+                            })()
+                          : "---"}
+                      </p>
+                    </div>
+                    <div className="flex items-center flex-col gap-1 justify-center">
+                      <p className="text-sm">2</p>
+                      <p className="bg-[var(--primary-light)] p-2.5 rounded-sm w-12 flex items-center justify-center">
+                        {match.sport_event_status.match_status !== "ended"
+                          ? (() => {
+                              const foundEvent = odds.find(
+                                (event) =>
+                                  event.competitors[0].name ===
+                                    match.sport_event.competitors[0].name &&
+                                  event.competitors[1].name ===
+                                    match.sport_event.competitors[1].name
+                              );
+                              const oddsValue =
+                                foundEvent?.markets?.[0]?.books?.[0]
+                                  ?.outcomes?.[2]?.odds;
+                              return oddsValue
+                                ? parseFloat(oddsValue).toFixed(2)
+                                : "---";
+                            })()
+                          : "---"}
+                      </p>
+                    </div>
+                  </div>
+                  <span className="cursor-pointer">
+                    <GreaterThanIcon />
+                  </span>
                 </div>
               </div>
-              <div className="flex items-center gap-8">
-                <div className="text-xl flex flex-col gap-2 items-center justify-center">
-                  <span>
-                    {match.sport_event_status.status === "not_started"
-                      ? "-"
-                      : match.sport_event_status.home_score}
-                  </span>
-                  <span>
-                    {match.sport_event_status.status === "not_started"
-                      ? "-"
-                      : match.sport_event_status.away_score}
-                  </span>
-                </div>
-                <span>
-                  <FootballPitchIcon />
-                </span>
-                <div className="flex items-center gap-4 [&>div>p:nth-child(2)]:cursor-pointer">
-                  <div className="flex items-center flex-col gap-1 justify-center">
-                    <p className="text-sm">1</p>
-                    <p className="bg-[var(--primary-light)] p-2.5 rounded-sm w-12 flex items-center justify-center">
-                      {match.sport_event_status.match_status !== "ended"
-                        ? (() => {
-                            const foundEvent = odds.find(
-                              (event) =>
-                                event.competitors[0].name ===
-                                  match.sport_event.competitors[0].name &&
-                                event.competitors[1].name ===
-                                  match.sport_event.competitors[1].name
-                            );
-                            const oddsValue =
-                              foundEvent?.markets?.[0]?.books?.[0]
-                                ?.outcomes?.[0]?.odds;
-                            return oddsValue
-                              ? parseFloat(oddsValue).toFixed(2)
-                              : "---";
-                          })()
-                        : "---"}
-                    </p>
-                  </div>
-                  <div className="flex items-center flex-col gap-1 justify-center">
-                    <p className="text-sm">X</p>
-                    <p className="bg-[var(--primary-light)] p-2.5 rounded-sm w-12 flex items-center justify-center">
-                      {match.sport_event_status.match_status !== "ended"
-                        ? (() => {
-                            const foundEvent = odds.find(
-                              (event) =>
-                                event.competitors[0].name ===
-                                  match.sport_event.competitors[0].name &&
-                                event.competitors[1].name ===
-                                  match.sport_event.competitors[1].name
-                            );
-                            const oddsValue =
-                              foundEvent?.markets?.[0]?.books?.[0]
-                                ?.outcomes?.[1]?.odds;
-                            return oddsValue
-                              ? parseFloat(oddsValue).toFixed(2)
-                              : "---";
-                          })()
-                        : "---"}
-                    </p>
-                  </div>
-                  <div className="flex items-center flex-col gap-1 justify-center">
-                    <p className="text-sm">2</p>
-                    <p className="bg-[var(--primary-light)] p-2.5 rounded-sm w-12 flex items-center justify-center">
-                      {match.sport_event_status.match_status !== "ended"
-                        ? (() => {
-                            const foundEvent = odds.find(
-                              (event) =>
-                                event.competitors[0].name ===
-                                  match.sport_event.competitors[0].name &&
-                                event.competitors[1].name ===
-                                  match.sport_event.competitors[1].name
-                            );
-                            const oddsValue =
-                              foundEvent?.markets?.[0]?.books?.[0]
-                                ?.outcomes?.[2]?.odds;
-                            return oddsValue
-                              ? parseFloat(oddsValue).toFixed(2)
-                              : "---";
-                          })()
-                        : "---"}
-                    </p>
-                  </div>
-                </div>
-                <span className="cursor-pointer">
-                  <GreaterThanIcon />
-                </span>
-              </div>
-            </div>
-          ))}
+            ))}
         </div>
       </div>
     </Link>

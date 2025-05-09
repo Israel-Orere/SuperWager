@@ -59,6 +59,7 @@ export const BettingSlipsProvider: React.FC<{ children: ReactNode }> = ({
     localStorage.setItem("history", JSON.stringify(history));
 
     setGameState(initialState);
+    localStorage.setItem("game", JSON.stringify(gameState));
   };
 
   const addSlip = (slip: BettingSlip) => {
@@ -69,6 +70,7 @@ export const BettingSlipsProvider: React.FC<{ children: ReactNode }> = ({
         { ...slip, matchDate: new Date(slip.matchDate).toISOString() },
       ],
     }));
+    localStorage.setItem("game", JSON.stringify(gameState));
   };
 
   const removeSlip = (slip: Partial<BettingSlip>) => {
@@ -84,18 +86,22 @@ export const BettingSlipsProvider: React.FC<{ children: ReactNode }> = ({
       poolId: updatedSlips.length === 0 ? null : prev.poolId,
       hasEnteredPool: updatedSlips.length === 0 ? false : prev.hasEnteredPool,
     }));
+    localStorage.setItem("game", JSON.stringify(gameState));
   };
 
   const setPoolId = (id: string) => {
     setGameState((prev) => ({ ...prev, poolId: id }));
+    localStorage.setItem("game", JSON.stringify(gameState));
   };
 
   const setHasEnteredPool = (val: boolean) => {
     setGameState((prev) => ({ ...prev, hasEnteredPool: val }));
+    localStorage.setItem("game", JSON.stringify(gameState));
   };
 
   const updateSlipStatus = (val: boolean) => {
     setGameState((prev) => ({ ...prev, hasPoolEnded: val }));
+    localStorage.setItem("game", JSON.stringify(gameState));
   };
 
   const updateGameOutcome = (
@@ -108,6 +114,7 @@ export const BettingSlipsProvider: React.FC<{ children: ReactNode }> = ({
         idx === i ? { ...slip, outcome } : slip
       ),
     }));
+    localStorage.setItem("game", JSON.stringify(gameState));
   };
 
   useEffect(() => {
@@ -120,6 +127,8 @@ export const BettingSlipsProvider: React.FC<{ children: ReactNode }> = ({
       );
       if (hasStarted && gameState.hasEnteredPool) {
         setGameState((prev) => ({ ...prev, hasPoolStarted: true }));
+        localStorage.setItem("game", JSON.stringify(gameState));
+
         clearInterval(interval);
       }
     }, 5000);
@@ -137,11 +146,13 @@ export const BettingSlipsProvider: React.FC<{ children: ReactNode }> = ({
 
     if (gameState.slips.some((slip) => slip.outcome === "lost")) {
       setGameState((prev) => ({ ...prev, hasWon: "lost" }));
+      localStorage.setItem("game", JSON.stringify(gameState));
       return;
     }
 
     if (gameState.slips.every((slip) => slip.outcome === "won")) {
       setGameState((prev) => ({ ...prev, hasWon: "won" }));
+      localStorage.setItem("game", JSON.stringify(gameState));
       return;
     }
   }, [gameState.hasPoolEnded, gameState.slips, gameState.hasWon]);
@@ -150,10 +161,6 @@ export const BettingSlipsProvider: React.FC<{ children: ReactNode }> = ({
     const storedGameState = localStorage.getItem("game");
     if (storedGameState) setGameState(JSON.parse(storedGameState));
   }, []);
-
-  useEffect(() => {
-    localStorage.setItem("game", JSON.stringify(gameState));
-  }, [gameState]);
 
   return (
     <BettingSlipsContext.Provider

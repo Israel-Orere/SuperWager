@@ -15,8 +15,6 @@ type MatchesContextType = {
   isError: boolean;
   startingDate: string;
   setStartingDate: React.Dispatch<React.SetStateAction<string>>;
-  isReady: boolean;
-  val: any;
 };
 
 const MatchesContext = createContext<MatchesContextType | undefined>(undefined);
@@ -40,8 +38,12 @@ export const MatchesProvider = ({
     new Date().toDateString()
   );
 
-  const { data, isLoading, isError } = useQuery({
-    queryKey: ["matches", league, radar_leagues[league].season_id],
+  const {
+    data,
+    isLoading: isLoadingGames,
+    isError,
+  } = useQuery({
+    queryKey: ["matches", radar_leagues[league].season_id],
     queryFn: async () => await fetchMatches(radar_leagues[league].season_id),
     refetchOnWindowFocus: true,
     // staleTime: 10000,
@@ -55,32 +57,11 @@ export const MatchesProvider = ({
       return matchDate === new Date(startingDate).toDateString();
     }) || [];
 
-  const { data: odds } = useQuery({
-    queryKey: ["odds", league, radar_leagues[league].odds],
+  const { data: odds, isLoading: isLoadingOdds } = useQuery({
+    queryKey: ["odds", radar_leagues[league].odds],
     queryFn: async () => await fetchOdds(radar_leagues[league].odds),
     refetchOnWindowFocus: true,
   });
-
-  const [isReady, setIsReady] = useState(false);
-  const [val, setVal] = useState(null);
-
-  // const ws = useRef<WebSocket | null>(null);
-
-  // useEffect(() => {
-  //   const socket = new WebSocket(buildOddsWebSocketUrl("soccer_italy_serie_a"));
-
-  //   socket.onopen = () => setIsReady(true);
-  //   socket.onclose = () => setIsReady(false);
-  //   socket.onmessage = (event) => {
-  //     setVal(event.data);
-  //   };
-
-  //   ws.current = socket;
-
-  //   return () => {
-  //     socket.close();
-  //   };
-  // }, []);
 
   return (
     <MatchesContext.Provider
@@ -90,12 +71,10 @@ export const MatchesProvider = ({
         league,
         next,
         prev,
-        isLoading,
+        isLoading: isLoadingGames || isLoadingOdds,
         isError,
         startingDate,
         setStartingDate,
-        isReady,
-        val,
       }}
     >
       {children}
