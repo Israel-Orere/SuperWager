@@ -38,11 +38,7 @@ export const MatchesProvider = ({
     new Date().toDateString()
   );
 
-  const {
-    data,
-    isLoading: isLoadingGames,
-    isError,
-  } = useQuery({
+  const { data, isLoading, isError } = useQuery({
     queryKey: ["matches", radar_leagues[league].season_id],
     queryFn: async () => await fetchMatches(radar_leagues[league].season_id),
     refetchOnWindowFocus: true,
@@ -57,7 +53,7 @@ export const MatchesProvider = ({
       return matchDate === new Date(startingDate).toDateString();
     }) || [];
 
-  const { data: odds, isLoading: isLoadingOdds } = useQuery({
+  const { data: odds } = useQuery({
     queryKey: ["odds", radar_leagues[league].odds],
     queryFn: async () => await fetchOdds(radar_leagues[league].odds),
     refetchOnWindowFocus: true,
@@ -71,7 +67,7 @@ export const MatchesProvider = ({
         league,
         next,
         prev,
-        isLoading: isLoadingGames || isLoadingOdds,
+        isLoading,
         isError,
         startingDate,
         setStartingDate,

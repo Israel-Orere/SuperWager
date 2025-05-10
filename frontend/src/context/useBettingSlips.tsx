@@ -15,7 +15,12 @@ const BettingSlipsContext = createContext<
       setHasEnteredPool: (val: boolean) => void;
       updateSlipStatus: (val: boolean) => void;
       setPoolId: (val: string) => void;
-      updateGameOutcome: (outcome: MatchOutcome, i: number) => void;
+      updateGameOutcome: (
+        outcome: MatchOutcome,
+        i: number,
+        finalHomeScore: number,
+        finalAwayScore: number
+      ) => void;
       resetSlip: () => void;
       slips: BettingSlip[];
       hasEnteredPool: boolean;
@@ -27,22 +32,13 @@ const BettingSlipsContext = createContext<
   | undefined
 >(undefined);
 
-const initialState = {
+const initialState: GameState = {
   slips: [],
   hasEnteredPool: false,
   poolId: null,
   hasPoolStarted: false,
   hasPoolEnded: false,
-  hasWon: "pending" as MatchOutcome,
-};
-
-type GameState = {
-  slips: BettingSlip[];
-  hasEnteredPool: boolean;
-  poolId: string | null;
-  hasPoolStarted: boolean;
-  hasPoolEnded: boolean;
-  hasWon: MatchOutcome;
+  hasWon: "pending",
 };
 
 export const BettingSlipsProvider: React.FC<{ children: ReactNode }> = ({
@@ -51,15 +47,26 @@ export const BettingSlipsProvider: React.FC<{ children: ReactNode }> = ({
   const [gameState, setGameState] = useState<GameState>(initialState);
 
   const resetSlip = () => {
-    const history = [
-      gameState,
-      ...JSON.parse(localStorage.getItem("history") || "[]"),
-    ];
+    const updatedSlips: GameState = {
+      ...gameState,
+      hasWon: gameState.slips.some((slip) => slip.outcome === "lost")
+        ? "lost"
+        : "won",
+    };
 
-    localStorage.setItem("history", JSON.stringify(history));
+    setGameState(updatedSlips);
 
-    setGameState(initialState);
-    localStorage.setItem("game", JSON.stringify(gameState));
+    setTimeout(() => {
+      const history = [
+        updatedSlips,
+        ...JSON.parse(localStorage.getItem("history") || "[]"),
+      ];
+
+      localStorage.setItem("history", JSON.stringify(history));
+
+      setGameState(initialState);
+      localStorage.setItem("game", JSON.stringify(initialState));
+    }, 5000);
   };
 
   const addSlip = (slip: BettingSlip) => {
@@ -106,12 +113,14 @@ export const BettingSlipsProvider: React.FC<{ children: ReactNode }> = ({
 
   const updateGameOutcome = (
     outcome: "pending" | "won" | "lost",
-    i: number
+    i: number,
+    finalHomeScore: number,
+    finalAwayScore: number
   ) => {
     setGameState((prev) => ({
       ...prev,
       slips: prev.slips.map((slip, idx) =>
-        idx === i ? { ...slip, outcome } : slip
+        idx === i ? { ...slip, outcome, finalHomeScore, finalAwayScore } : slip
       ),
     }));
     localStorage.setItem("game", JSON.stringify(gameState));
@@ -135,27 +144,6 @@ export const BettingSlipsProvider: React.FC<{ children: ReactNode }> = ({
 
     return () => clearInterval(interval);
   }, [gameState.slips, gameState.hasEnteredPool, gameState.hasPoolStarted]);
-
-  useEffect(() => {
-    if (
-      !gameState.hasPoolEnded ||
-      gameState.hasWon !== "pending" ||
-      gameState.slips.length > 0
-    )
-      return;
-
-    if (gameState.slips.some((slip) => slip.outcome === "lost")) {
-      setGameState((prev) => ({ ...prev, hasWon: "lost" }));
-      localStorage.setItem("game", JSON.stringify(gameState));
-      return;
-    }
-
-    if (gameState.slips.every((slip) => slip.outcome === "won")) {
-      setGameState((prev) => ({ ...prev, hasWon: "won" }));
-      localStorage.setItem("game", JSON.stringify(gameState));
-      return;
-    }
-  }, [gameState.hasPoolEnded, gameState.slips, gameState.hasWon]);
 
   useEffect(() => {
     const storedGameState = localStorage.getItem("game");

@@ -22,11 +22,11 @@ export default function Navbar() {
         <nav className="hidden xl:flex gap-6 items-center justify-center">
           {[
             { label: "Sports", href: "/sports" },
-            { label: "Live Matches", href: "/live-matches" },
             { label: "Leaderboard", href: "/leaderboard" },
             { label: "Player Support", href: "/player-support" },
             { label: "Contact", href: "/contact" },
             { label: "Language", href: "/language" },
+            { label: "Bet History", href: "/bet-history" },
             { label: "Create Slip", href: "/create-slip" },
           ].map((item, i) => (
             <Link
@@ -70,11 +70,11 @@ export default function Navbar() {
           <nav className="flex flex-col w-full items-center justify-center border-t border-t-[var(--primary)]/20">
             {[
               { label: "Sports", href: "/sports" },
-              { label: "Live Matches", href: "/live-matches" },
               { label: "Leaderboard", href: "/leaderboard" },
               { label: "Player Support", href: "/player-support" },
               { label: "Contact", href: "/contact" },
               { label: "Language", href: "/language" },
+              { label: "Bet History", href: "/bet-history" },
               { label: "Create Slip", href: "/create-slip" },
             ].map((item, i) => (
               <Link

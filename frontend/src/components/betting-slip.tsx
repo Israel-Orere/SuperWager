@@ -67,7 +67,7 @@ export default function BettingSlip() {
   const [showConfetti, setShowConfetti] = useState(false);
 
   useEffect(() => {
-    if (!scoresData?.length) return;
+    if (!scoresData?.length || hasPoolEnded) return;
 
     const checkPoolEnded = () => {
       const hasPoolEnded = scoresData.every(
@@ -83,7 +83,13 @@ export default function BettingSlip() {
     checkPoolEnded();
     const intervalId = setInterval(checkPoolEnded, 5000);
     return () => clearInterval(intervalId);
-  }, [scoresData]);
+  }, [scoresData, hasPoolEnded]);
+
+  useEffect(() => {
+    if (!(hasPoolEnded && hasWon === "pending" && slips)) return;
+
+    resetSlip();
+  }, [hasPoolEnded, hasWon, slips]);
 
   useEffect(() => {
     if (!hasPoolEnded) return;

@@ -20,7 +20,12 @@ export default function SlipCard({
   scoresData: Schedule[];
   hasPoolStarted: boolean;
   idx: number;
-  updateGameOutcome: (outcome: MatchOutcome, i: number) => void;
+  updateGameOutcome: (
+    outcome: MatchOutcome,
+    i: number,
+    finalHomeScore: number,
+    finalAwayScore: number
+  ) => void;
   removeSlip: (game: BettingSlip) => void;
 }) {
   const router = useRouter();
@@ -30,17 +35,18 @@ export default function SlipCard({
   useEffect(() => {
     const match = scoresData[idx];
 
+    const homeScore = match?.sport_event_status.home_score as number;
+    const awayScore = match?.sport_event_status.away_score as number;
+
     if (
       !match ||
       new Date(match.sport_event.start_time) > new Date() ||
       match.sport_event_status.match_status !== "ended"
     ) {
+      updateGameOutcome("pending", idx, homeScore, awayScore);
       setMatchOutcome("pending");
       return;
     }
-
-    const homeScore = match.sport_event_status.home_score as number;
-    const awayScore = match.sport_event_status.away_score as number;
 
     const selection = game.selection.toLowerCase();
     const isHomeWin = homeScore > awayScore;
@@ -52,11 +58,11 @@ export default function SlipCard({
       (selection === "away" && isAwayWin) ||
       (selection === "draw" && isDraw)
     ) {
-      updateGameOutcome("won", idx);
+      updateGameOutcome("won", idx, homeScore, awayScore);
       setMatchOutcome("won");
       return;
     } else {
-      updateGameOutcome("lost", idx);
+      updateGameOutcome("lost", idx, homeScore, awayScore);
       setMatchOutcome("lost");
       return;
     }
