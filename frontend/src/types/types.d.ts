@@ -3,7 +3,9 @@ type MatchSelection = "home" | "away" | "draw";
 
 interface BettingSlip {
   homeTeam: string;
+  finalHomeScore?: number | null;
   awayTeam: string;
+  finalAwayScore?: number | null;
   matchDate: string;
   selection: MatchSelection;
   odds: string;
@@ -51,3 +53,12 @@ interface Outcome {
   type: "home" | "draw" | "away";
   odds: string;
 }
+
+type GameState = {
+  slips: BettingSlip[];
+  hasEnteredPool: boolean;
+  poolId: string | null;
+  hasPoolStarted: boolean;
+  hasPoolEnded: boolean;
+  hasWon: MatchOutcome;
+};
