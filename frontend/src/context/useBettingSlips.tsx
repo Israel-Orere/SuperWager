@@ -2,90 +2,177 @@
 
 import React, {
   createContext,
-  useContext,
-  useState,
   ReactNode,
+  useContext,
   useEffect,
+  useState,
 } from "react";
-
-export interface BettingSlip {
-  homeTeam: string;
-  awayTeam: string;
-  matchDate: string;
-  selection: "home" | "away" | "draw";
-  odds: number;
-  outcome: "pending" | "won" | "lost";
-}
 
 const BettingSlipsContext = createContext<
   | {
-      slips: BettingSlip[];
       addSlip: (slip: BettingSlip) => void;
       removeSlip: (slip: BettingSlip) => void;
-      updateSlip: (index: number, updatedSlip: BettingSlip) => void;
+      setHasEnteredPool: (val: boolean) => void;
+      updateSlipStatus: (val: boolean) => void;
+      setPoolId: (val: string) => void;
+      updateGameOutcome: (outcome: MatchOutcome, i: number) => void;
+      resetSlip: () => void;
+      slips: BettingSlip[];
       hasEnteredPool: boolean;
       hasPoolStarted: boolean;
       poolId: string | null;
-      setHasEnteredPool: React.Dispatch<React.SetStateAction<boolean>>;
-      setPoolId: React.Dispatch<React.SetStateAction<string | null>>;
-      setHasPoolStarted: React.Dispatch<React.SetStateAction<boolean>>;
+      hasPoolEnded: boolean;
+      hasWon: MatchOutcome;
     }
   | undefined
 >(undefined);
 
+const initialState = {
+  slips: [],
+  hasEnteredPool: false,
+  poolId: null,
+  hasPoolStarted: false,
+  hasPoolEnded: false,
+  hasWon: "pending" as MatchOutcome,
+};
+
+type GameState = {
+  slips: BettingSlip[];
+  hasEnteredPool: boolean;
+  poolId: string | null;
+  hasPoolStarted: boolean;
+  hasPoolEnded: boolean;
+  hasWon: MatchOutcome;
+};
+
 export const BettingSlipsProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
-  const [slips, setSlips] = useState<BettingSlip[]>([]);
-  const [hasEnteredPool, setHasEnteredPool] = useState(false);
-  const [poolId, setPoolId] = useState<string | null>(null);
-  const [hasPoolStarted, setHasPoolStarted] = useState(false);
-  const [poolEndDate, setPoolEndDate] = useState<string | null>(null);
+  const [gameState, setGameState] = useState<GameState>(initialState);
+
+  const resetSlip = () => {
+    const history = [
+      gameState,
+      ...JSON.parse(localStorage.getItem("history") || "[]"),
+    ];
+
+    localStorage.setItem("history", JSON.stringify(history));
+
+    setGameState(initialState);
+    localStorage.setItem("game", JSON.stringify(gameState));
+  };
 
   const addSlip = (slip: BettingSlip) => {
-    setSlips((prevSlips) => [
-      ...prevSlips,
-      { ...slip, matchDate: new Date(slip.matchDate).toISOString() },
-    ]);
+    setGameState((prev) => ({
+      ...prev,
+      slips: [
+        ...prev.slips,
+        { ...slip, matchDate: new Date(slip.matchDate).toISOString() },
+      ],
+    }));
+    localStorage.setItem("game", JSON.stringify(gameState));
   };
 
   const removeSlip = (slip: Partial<BettingSlip>) => {
-    const updatedSlips = slips.filter(
+    const updatedSlips = gameState.slips.filter(
       (s) =>
         s.homeTeam !== slip.homeTeam &&
         s.awayTeam !== slip.awayTeam &&
         s.odds !== slip.odds
     );
+    setGameState((prev) => ({
+      ...prev,
+      slips: updatedSlips,
+      poolId: updatedSlips.length === 0 ? null : prev.poolId,
+      hasEnteredPool: updatedSlips.length === 0 ? false : prev.hasEnteredPool,
+    }));
+    localStorage.setItem("game", JSON.stringify(gameState));
+  };
 
-    setSlips(updatedSlips);
+  const setPoolId = (id: string) => {
+    setGameState((prev) => ({ ...prev, poolId: id }));
+    localStorage.setItem("game", JSON.stringify(gameState));
+  };
 
-    if (updatedSlips.length === 0) {
-      setPoolId(null);
-      setHasEnteredPool(false);
+  const setHasEnteredPool = (val: boolean) => {
+    setGameState((prev) => ({ ...prev, hasEnteredPool: val }));
+    localStorage.setItem("game", JSON.stringify(gameState));
+  };
+
+  const updateSlipStatus = (val: boolean) => {
+    setGameState((prev) => ({ ...prev, hasPoolEnded: val }));
+    localStorage.setItem("game", JSON.stringify(gameState));
+  };
+
+  const updateGameOutcome = (
+    outcome: "pending" | "won" | "lost",
+    i: number
+  ) => {
+    setGameState((prev) => ({
+      ...prev,
+      slips: prev.slips.map((slip, idx) =>
+        idx === i ? { ...slip, outcome } : slip
+      ),
+    }));
+    localStorage.setItem("game", JSON.stringify(gameState));
+  };
+
+  useEffect(() => {
+    if (gameState.hasPoolStarted) return;
+
+    const interval = setInterval(() => {
+      if (gameState.slips.length === 0) return;
+      const hasStarted = gameState.slips.some(
+        (slip) => new Date(slip.matchDate) <= new Date()
+      );
+      if (hasStarted && gameState.hasEnteredPool) {
+        setGameState((prev) => ({ ...prev, hasPoolStarted: true }));
+        localStorage.setItem("game", JSON.stringify(gameState));
+
+        clearInterval(interval);
+      }
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [gameState.slips, gameState.hasEnteredPool, gameState.hasPoolStarted]);
+
+  useEffect(() => {
+    if (
+      !gameState.hasPoolEnded ||
+      gameState.hasWon !== "pending" ||
+      gameState.slips.length > 0
+    )
+      return;
+
+    if (gameState.slips.some((slip) => slip.outcome === "lost")) {
+      setGameState((prev) => ({ ...prev, hasWon: "lost" }));
+      localStorage.setItem("game", JSON.stringify(gameState));
+      return;
     }
-  };
 
-  const updateSlip = (index: number, updatedSlip: BettingSlip) => {
-    setSlips((prevSlips) =>
-      prevSlips.map((slip, i) => (i === index ? updatedSlip : slip))
-    );
-  };
+    if (gameState.slips.every((slip) => slip.outcome === "won")) {
+      setGameState((prev) => ({ ...prev, hasWon: "won" }));
+      localStorage.setItem("game", JSON.stringify(gameState));
+      return;
+    }
+  }, [gameState.hasPoolEnded, gameState.slips, gameState.hasWon]);
 
-  useEffect(() => {}, []);
+  useEffect(() => {
+    const storedGameState = localStorage.getItem("game");
+    if (storedGameState) setGameState(JSON.parse(storedGameState));
+  }, []);
 
   return (
     <BettingSlipsContext.Provider
       value={{
-        slips,
         addSlip,
         removeSlip,
-        updateSlip,
-        hasEnteredPool,
-        hasPoolStarted,
-        poolId,
-        setHasEnteredPool,
         setPoolId,
-        setHasPoolStarted,
+        setHasEnteredPool,
+        updateSlipStatus,
+        updateGameOutcome,
+        resetSlip,
+        ...gameState,
       }}
     >
       {children}

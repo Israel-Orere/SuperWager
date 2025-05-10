@@ -7,15 +7,17 @@ import { useAuthModal } from "@/context/AuthModalContext";
 
 export default function Navbar() {
   const [showNav, setShowNav] = useState(false);
-  const { openModal } = useAuthModal();
+  const { openModal, user } = useAuthModal();
 
   return (
     <header className="w-full max-w-screen-2xl mx-auto px-[5%] flex items-center justify-center">
       <div className="py-4 w-full flex items-center justify-between gap-4 max-w-screen-3xl overflow-x-hidden z-50">
         <div className="flex-shrink-0">
-          <h1 className="text-xl font-bold text-[var(--primary)] inknut-antiqua">
-            Superwager
-          </h1>
+          <Link href={"/"}>
+            <h1 className="text-xl font-bold text-[var(--primary)] inknut-antiqua">
+              Superwager
+            </h1>
+          </Link>
         </div>
         <nav className="hidden xl:flex gap-6 items-center justify-center">
           {[
@@ -36,14 +38,16 @@ export default function Navbar() {
             </Link>
           ))}
         </nav>
-        <div className="hidden xl:flex items-center gap-4">
-          <button
-            onClick={openModal}
-            className="bg-white border-[var(--primary)] border-[2px] rounded-[4px] text-[var(--primary)] p-2.5 px-4 font-medium text-base transition-all cursor-pointer hover:bg-white/80"
-          >
-            Log in
-          </button>
-        </div>
+        {!user && (
+          <div className="hidden xl:flex items-center gap-4">
+            <button
+              onClick={openModal}
+              className="bg-white border-[var(--primary)] border-[2px] rounded-[4px] text-[var(--primary)] p-2.5 px-4 font-medium text-base transition-all cursor-pointer hover:bg-white/80"
+            >
+              Log in
+            </button>
+          </div>
+        )}
 
         <span
           className="xl:hidden cursor-pointer"
@@ -82,14 +86,16 @@ export default function Navbar() {
               </Link>
             ))}
           </nav>
-          <div className="flex xl:hidden flex-col items-center gap-4">
-            <button
-              onClick={openModal}
-              className="bg-transparent rounded-[4px] border text-[var(--primary)] border-[var(--primary)] p-2.5 px-4 font-medium cursor-pointer text-sm transition-all"
-            >
-              Login
-            </button>
-          </div>
+          {!user && (
+            <div className="flex xl:hidden flex-col items-center gap-4">
+              <button
+                onClick={openModal}
+                className="bg-transparent rounded-[4px] border text-[var(--primary)] border-[var(--primary)] p-2.5 px-4 font-medium cursor-pointer text-sm transition-all"
+              >
+                Login
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </header>

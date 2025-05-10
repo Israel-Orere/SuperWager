@@ -1,6 +1,13 @@
 "use client";
 
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
+
+type UserType = {
+  username: string;
+  email: string;
+  password: string;
+  wallet?: string;
+} | null;
 
 type ModalContextType = {
   isOpen: boolean;
@@ -8,6 +15,8 @@ type ModalContextType = {
   closeModal: () => void;
   isSignUp: boolean;
   toggleMode: () => void;
+  user: UserType;
+  setUser: React.Dispatch<React.SetStateAction<UserType>>;
 };
 
 const AuthModalContext = createContext<ModalContextType | undefined>(undefined);
@@ -24,9 +33,24 @@ export const AuthModalProvider = ({
   const closeModal = () => setIsOpen(false);
   const toggleMode = () => setIsSignUp((prev) => !prev);
 
+  const [user, setUser] = useState<UserType | null>(null);
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) setUser(JSON.parse(storedUser));
+  }, []);
+
   return (
     <AuthModalContext.Provider
-      value={{ isOpen, isSignUp, openModal, closeModal, toggleMode }}
+      value={{
+        isOpen,
+        isSignUp,
+        openModal,
+        closeModal,
+        toggleMode,
+        user,
+        setUser,
+      }}
     >
       {children}
     </AuthModalContext.Provider>
