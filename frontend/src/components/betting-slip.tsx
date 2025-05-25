@@ -1,5 +1,7 @@
 "use client";
-
+import PoolEntry from '@/blockchain/contracts/components/PoolEntry';
+import PoolRewards from '@/blockchain/contracts/components/PoolRewards';
+import { toast } from "sonner";
 import GreaterThan from "@/assets/svgs/double-greaterthan";
 import LessThan from "@/assets/svgs/double-lessthan";
 import { useBettingSlips } from "@/context/useBettingSlips";
@@ -10,7 +12,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Confetti from "react-confetti";
-import { toast } from "sonner";
+// import { toast } from "sonner";
 import SlipCard from "./slip-card";
 
 export default function BettingSlip() {
@@ -111,65 +113,40 @@ export default function BettingSlip() {
     <>
       {hasWon !== "pending" && (
         <div className="fixed inset-0 items-center justify-center flex z-50">
-          <div className="absolute inset-0 bg-black/50" />
+          <div className="absolute inset-0 bg-black/50" onClick={() => resetSlip()} />
           <div className="bg-white rounded-[20px] p-10 relative flex flex-col items-center justify-center gap-10">
-            <p className="text-xl font-semibold">
-              You {hasWon === "lost" ? "Lose" : "Won"}
-            </p>
+            <PoolRewards 
+              hasWon={hasWon} 
+              onClose={resetSlip} 
+            />
           </div>
         </div>
       )}
       {showEnterPoolModal && (
         <div className="fixed inset-0 items-center justify-center flex z-50">
-          <div className="absolute inset-0 bg-black/50" />
+          <div className="absolute inset-0 bg-black/50" onClick={() => setShowEnterPoolModal(false)} />
           <div className="bg-white rounded-[20px] p-10 relative flex flex-col items-center justify-center gap-10">
-            <div className="flex w-full flex-col gap-6">
-              <div className="flex justify-between items-center gap-10">
-                <p className="text-3xl">Enter Pool</p>
-                <div className="rounded-[10px] gap-5 px-6 py-4 bg-[var(--primary-light)] flex items-center justify-center">
-                  <span className="cursor-pointer">
-                    <LessThan />
-                  </span>
-                  <p className="text-2xl">0.1 SST</p>
-                  <span className="cursor-pointer">
-                    <GreaterThan />
-                  </span>
-                </div>
-              </div>
-              <div className="flex justify-between items-center">
-                <p className="text-3xl">Wallet balance</p>
-                <p className="text-2xl">5 STT</p>
-              </div>
-            </div>
-            <div className="flex items-center justify-center gap-4">
-              <p className="text-[var(--primary)] text-2xl flex gap-2 items-center cursor-pointer">
-                Fund Wallet
-                <span>
-                  <Plus className="stroke-[var(--primary)] stroke-2" />
-                </span>
-              </p>
-              <button
-                onClick={() => {
-                  setHasEnteredPool(true);
-                  toast.success("You have entered the pool");
-                  setShowEnterPoolModal(false);
-                  localStorage.setItem(
-                    "game",
-                    JSON.stringify({
-                      slips,
-                      poolId,
-                      hasEnteredPool,
-                      hasPoolStarted,
-                      hasPoolEnded,
-                      hasWon,
-                    })
-                  );
-                }}
-                className="text-lg font-normal bg-[var(--primary)] rounded-lg px-3.5 py-4 text-white capitalize hover:bg-[var(--primary)]/80"
-              >
-                Choose Pool
-              </button>
-            </div>
+            <PoolEntry 
+              onSuccess={() => {
+                setHasEnteredPool(true);
+                toast.success("You have entered the pool");
+                setShowEnterPoolModal(false);
+                localStorage.setItem(
+                  "game",
+                  JSON.stringify({
+                    slips,
+                    poolId,
+                    hasEnteredPool: true,
+                    hasPoolStarted,
+                    hasPoolEnded,
+                    hasWon,
+                  })
+                );
+              }}
+              onError={(error) => {
+                toast.error(error);
+              }}
+            />
           </div>
         </div>
       )}

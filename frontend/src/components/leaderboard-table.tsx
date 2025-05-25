@@ -3,6 +3,7 @@
 import GreaterThan from "@/assets/svgs/double-greaterthan";
 import LessThan from "@/assets/svgs/double-lessthan";
 import { useAuthModal } from "@/context/AuthModalContext";
+import { usePrivy } from "@privy-io/react-auth";
 import { useEffect, useState } from "react";
 
 const mockData = [
@@ -54,13 +55,56 @@ const mockData = [
     accuracy: { accuracy: 0.3, points: 0.8 },
     totalPoints: 3.8,
   },
+  {
+    name: "Sam Wilson",
+    totalOdds: { odds: 13, points: 1.6 },
+    accuracy: { accuracy: 1.3, points: 2.0 },
+    totalPoints: 3.6,
+  },
+  {
+    name: "Casey Martinez",
+    totalOdds: { odds: 9, points: 1.4 },
+    accuracy: { accuracy: 0.9, points: 2.1 },
+    totalPoints: 3.5,
+  },
+  {
+    name: "Terry Johnson",
+    totalOdds: { odds: 7, points: 1.7 },
+    accuracy: { accuracy: 0.7, points: 1.7 },
+    totalPoints: 3.4,
+  },
+  {
+    name: "Robin Ahmed",
+    totalOdds: { odds: 8, points: 1.5 },
+    accuracy: { accuracy: 0.8, points: 1.8 },
+    totalPoints: 3.3,
+  },
+  {
+    name: "Avery Thompson",
+    totalOdds: { odds: 10, points: 1.1 },
+    accuracy: { accuracy: 1.0, points: 2.1 },
+    totalPoints: 3.2,
+  },
+  {
+    name: "Jordan Smith",
+    totalOdds: { odds: 6, points: 1.3 },
+    accuracy: { accuracy: 0.6, points: 1.8 },
+    totalPoints: 3.1,
+  },
+  {
+    name: "Quinn Jones",
+    totalOdds: { odds: 5, points: 1.8 },
+    accuracy: { accuracy: 0.5, points: 1.2 },
+    totalPoints: 3.0,
+  },
 ];
 
 type LeaderboardData = typeof mockData;
 
 const simulateUpdates = (
   data: LeaderboardData,
-  updateCallback: React.Dispatch<React.SetStateAction<LeaderboardData>>
+  updateCallback: React.Dispatch<React.SetStateAction<LeaderboardData>>,
+  displayCount: number
 ) =>
   setInterval(() => {
     const updatedData: LeaderboardData = JSON.parse(JSON.stringify(data));
@@ -83,24 +127,40 @@ const simulateUpdates = (
 
     updatedData.sort((a, b) => b.totalPoints - a.totalPoints);
 
-    updateCallback(updatedData.slice(0, 5));
+    updateCallback(updatedData.slice(0, displayCount));
   }, 5000);
 
 export default function LeaderboardTable() {
-  const [leaderboardData, setLeaderboardData] = useState(mockData);
+  const [leaderboardData, setLeaderboardData] = useState<LeaderboardData>([]);
+  const [showFullLeaderboard, setShowFullLeaderboard] = useState(false);
   const { openModal } = useAuthModal();
+  const { authenticated } = usePrivy();
+
+  const displayCount = showFullLeaderboard ? mockData.length : 5;
 
   useEffect(() => {
-    const intervalId = simulateUpdates(mockData, setLeaderboardData);
+    setLeaderboardData(mockData.slice(0, displayCount));
+
+    const intervalId = simulateUpdates(mockData, setLeaderboardData, displayCount);
     return () => clearInterval(intervalId);
-  }, []);
+  }, [displayCount]);
+
+  const handleViewFullLeaderboard = () => {
+    if (authenticated) {
+      setShowFullLeaderboard(true);
+    } else {
+      openModal();
+    }
+  };
 
   return (
     <div className="flex flex-col items-center justify-center gap-6 bg-[var(--primary-light)] p-6 md:px-8 rounded-2xl">
       <div className="w-full items-center flex justify-between">
         <div className="flex flex-col gap-1">
           <div className="flex gap-4 items-center">
-            <h2 className="text-3xl font-normal">Weekly Leaderboard</h2>
+            <h2 className="text-3xl font-normal">
+              {showFullLeaderboard ? "Complete Leaderboard" : "Weekly Leaderboard"}
+            </h2>
             <p className="text-[#32FF40] text-2xl">2D: 06H: 37M: 12S</p>
           </div>
           <div className="flex items-center gap-4">
@@ -166,12 +226,22 @@ export default function LeaderboardTable() {
         </tbody>
       </table>
       <div>
-        <button
-          onClick={openModal}
-          className="text-lg font-normal bg-[var(--primary)] rounded-lg p-3.5 text-white capitalize hover:bg-[var(--primary)]/80"
-        >
-          See Full Leaderboard
-        </button>
+        {!showFullLeaderboard && (
+          <button
+            onClick={handleViewFullLeaderboard}
+            className="text-lg font-normal bg-[var(--primary)] rounded-lg p-3.5 text-white capitalize hover:bg-[var(--primary)]/80"
+          >
+            See Full Leaderboard
+          </button>
+        )}
+        {showFullLeaderboard && (
+          <button
+            onClick={() => setShowFullLeaderboard(false)}
+            className="text-lg font-normal bg-gray-600 rounded-lg p-3.5 text-white capitalize hover:bg-gray-700"
+          >
+            Show Less
+          </button>
+        )}
       </div>
     </div>
   );

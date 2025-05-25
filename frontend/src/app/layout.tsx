@@ -1,4 +1,5 @@
 import Aside from "@/components/aside";
+import { PrivyProviderWrapper } from '@/providers/PrivyProvider';
 import AuthModalWrapper from "@/components/AuthModalWrapper";
 import Navbar from "@/components/navbar";
 import { AuthModalProvider } from "@/context/AuthModalContext";
@@ -22,23 +23,25 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="antialiased">
-        <QueryProvider>
-          <AuthModalProvider>
-            <MatchesProvider>
-              <BettingSlipsProvider>
-                <Toaster position="top-right" richColors />
-                <main className="relative">
-                  <Navbar />
-                  <div className="w-full min-h-screen p-[5%] flex gap-16 max-w-screen-2xl mx-auto">
-                    <div className="flex-[75%]">{children}</div>
-                    <Aside />
-                  </div>
-                  <AuthModalWrapper />
-                </main>
-              </BettingSlipsProvider>
-            </MatchesProvider>
-          </AuthModalProvider>
-        </QueryProvider>
+        <PrivyProviderWrapper>
+          <QueryProvider>
+            <AuthModalProvider>
+              <MatchesProvider>
+                <BettingSlipsProvider>
+                  <Toaster position="top-right" richColors />
+                  <main className="relative">
+                    <Navbar />
+                    <div className="w-full min-h-screen p-[5%] flex gap-16 max-w-screen-2xl mx-auto">
+                      <div className="flex-[75%]">{children}</div>
+                      <Aside />
+                    </div>
+                    <AuthModalWrapper />
+                  </main>
+                </BettingSlipsProvider>
+              </MatchesProvider>
+            </AuthModalProvider>
+          </QueryProvider>
+        </PrivyProviderWrapper>
       </body>
     </html>
   );
